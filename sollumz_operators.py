@@ -266,7 +266,7 @@ class SOLLUMZ_OT_paint_vertices(SOLLUMZ_OT_base, bpy.types.Operator):
 
     def paint_mesh(self, mesh, color):
         if not mesh.color_attributes:
-            mesh.color_attributes.new("Color", 'BYTE_COLOR', 'CORNER')
+            mesh.color_attributes.new("Color 1", 'BYTE_COLOR', 'CORNER')
         self.paint_map(mesh.attributes.active_color, color)
 
     def run(self, context):
@@ -554,7 +554,7 @@ class SOLLUMZ_OT_paste_location(bpy.types.Operator):
             self.report({'ERROR'}, "Invalid location string.")
 
         return {'FINISHED'}
-    
+
 class SOLLUMZ_OT_paste_rotation(bpy.types.Operator):
     """Paste the rotation (as quaternion) of an object from the clipboard and apply it"""
     bl_idname = "wm.sollumz_paste_rotation"
