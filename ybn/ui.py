@@ -271,9 +271,13 @@ class SOLLUMZ_PT_CREATE_BOUND_PANEL(bpy.types.Panel):
         layout.separator()
 
         row = layout.row()
-        row.operator(
-            ybn_ops.SOLLUMZ_OT_create_polygon_box_from_verts.bl_idname, icon="GROUP_VERTEX")
-        row.prop(context.scene, "poly_bound_type_verts", text="")
+        row.operator(ybn_ops.SOLLUMZ_OT_create_polygon_box_from_verts.bl_idname, icon="GROUP_VERTEX")
+        if context.active_object and context.active_object.mode == "EDIT":
+            row.prop(context.scene, "poly_bound_type_verts")
+            row.prop(context.scene, "poly_parent", expand=True)
+        else:
+            row.prop(context.scene, "create_poly_bound_type")
+        grid = layout.grid_flow(columns=3, even_columns=True, even_rows=True)
 
 
 class SOLLUMZ_PT_CREATE_MATERIAL_PANEL(bpy.types.Panel):

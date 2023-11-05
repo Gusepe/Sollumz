@@ -46,23 +46,32 @@ class SOLLUMZ_OT_create_polygon_box_from_verts(bpy.types.Operator):
 
     def execute(self, context):
         sollum_type = context.scene.poly_bound_type_verts
+        parent = context.scene.poly_parent
 
+        if not parent:
+            self.report({"ERROR"}, "Must specify a parent object!")
+            return {"CANCELLED"}
+
+        aobj = context.active_object
         selected = context.selected_objects
 
         if len(selected) < 1 and context.active_object:
             selected = [context.active_object]
 
+        if not aobj:
+            self.report({"ERROR"}, "No active object!")
+            return {"CANCELLED"}
+
         verts = []
         for obj in selected:
             verts.extend(get_selected_vertices(obj))
 
-        if selected and len(selected) == 1:
-            parent = selected[0].parent
-        else:
-            parent = None
+        if parent.sollum_type != SollumType.BOUND_GEOMETRYBVH and parent.sollum_type != SollumType.BOUND_GEOMETRY:
+            self.message(f"Parent must be a {SOLLUMZ_UI_NAMES[SollumType.BOUND_GEOMETRYBVH]} or {SOLLUMZ_UI_NAMES[SollumType.BOUND_GEOMETRY]}!")
+            return False
 
         if len(verts) < 3:
-            self.report({"INFO"}, "Please select at least three vertices.")
+            self.report({"ERROR"}, "Please select at least three vertices.")
             return {"CANCELLED"}
 
         pobj = create_blender_object(sollum_type)
@@ -73,13 +82,20 @@ class SOLLUMZ_OT_create_polygon_box_from_verts(bpy.types.Operator):
         center = world_matrix @ (bbmin + bbmax) / 2
         local_center = (bbmin + bbmax) / 2
 
-        create_box_from_extents(
-            pobj.data, bbmin - local_center, bbmax - local_center)
+        create_box_from_extents(pobj.data, bbmin - local_center, bbmax - local_center)
 
         pobj.matrix_world = world_matrix
         pobj.location = center
+        pobj.rotation_euler = world_matrix.to_euler()
 
         pobj.parent = parent
+
+        pobj_collection = pobj.users_collection[0]
+        parent_collection = parent.users_collection[0]
+
+        if parent_collection != pobj_collection:
+            pobj_collection.objects.unlink(pobj)
+            parent_collection.objects.link(pobj)
 
         return {"FINISHED"}
 

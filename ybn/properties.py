@@ -290,6 +290,10 @@ def register():
 
     bpy.types.Scene.poly_edge = bpy.props.EnumProperty(name="Edge", items=[("long", "Long Edge", "Create along the long edge"),
                                                                            ("short", "Short Edge", "Create along the short edge")])
+
+    bpy.types.Scene.poly_parent = bpy.props.PointerProperty(
+        type=bpy.types.Object, name="Parent", description=f"Bounds will be parented to this object. Parent must be a {SOLLUMZ_UI_NAMES[SollumType.BOUND_GEOMETRYBVH]} or {SOLLUMZ_UI_NAMES[SollumType.BOUND_GEOMETRY]}.")
+
     bpy.types.Scene.bound_child_type = bpy.props.EnumProperty(
         items=[
             (SollumType.BOUND_GEOMETRY.value,
@@ -330,6 +334,7 @@ def unregister():
     del bpy.types.Scene.create_poly_bound_type
     del bpy.types.Scene.create_seperate_composites
     del bpy.types.Scene.create_bound_type
+    del bpy.types.Scene.poly_parent
     del bpy.types.Scene.bound_child_type
     del bpy.types.Scene.split_collision_count
     del bpy.types.Scene.composite_apply_default_flag_preset
