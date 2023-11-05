@@ -132,7 +132,7 @@ class MaterialConverter:
             raise Exception(
                 "Failed to replace material: Sollumz material has not been created yet!")
 
-        mat_name = f"{self.material.name}_{self.new_material.name}"
+        mat_name = f"{self.material.name} | {self.new_material.name}"
 
         self.new_material.name = mat_name
 
