@@ -92,19 +92,11 @@ def add_to_vector(v, f):
 
 
 def get_min_vector(v, c):
-    r = Vector((0, 0, 0))
-    r.x = min(v.x, c.x)
-    r.y = min(v.y, c.y)
-    r.z = min(v.z, c.z)
-    return r
+    return Vector([min(vi, ci) for vi, ci in zip(v, c)])
 
 
 def get_max_vector(v, c):
-    r = Vector((0, 0, 0))
-    r.x = max(v.x, c.x)
-    r.y = max(v.y, c.y)
-    r.z = max(v.z, c.z)
-    return r
+    return Vector([max(vi, ci) for vi, ci in zip(v, c)])
 
 
 def get_min_vector_list(vecs: list[Vector]):

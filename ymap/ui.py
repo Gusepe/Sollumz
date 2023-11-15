@@ -2,8 +2,6 @@ import bpy
 
 from ..sollumz_properties import SollumType
 from ..sollumz_ui import SOLLUMZ_PT_OBJECT_PANEL
-from ..ymap.operators import SOLLUMZ_OT_create_ymap
-
 
 def draw_ymap_properties(self, context):
     obj = context.active_object
@@ -11,40 +9,11 @@ def draw_ymap_properties(self, context):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        layout.prop(obj.ymap_properties, "name")
         layout.prop(obj.ymap_properties, "parent")
-
-        layout.label(text="Map Flags")
-        layout.prop(obj.ymap_properties, "flags")
-
         row = layout.row()
-        row.prop(obj.ymap_properties.flags_toggle, "script_loaded", toggle=1)
-        row.prop(obj.ymap_properties.flags_toggle, "has_lod", toggle=1)
+        row.prop(obj.ymap_properties.flags_toggle, "script_loaded")
 
         layout.prop(obj.ymap_properties, "content_flags")
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle, "has_hd", toggle=1)
-        row.prop(obj.ymap_properties.content_flags_toggle, "has_lod", toggle=1)
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_slod2", toggle=1)
-        row.prop(obj.ymap_properties.content_flags_toggle, "has_int", toggle=1)
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle, "has_slod", toggle=1)
-        row.prop(obj.ymap_properties.content_flags_toggle, "has_occl", toggle=1)
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_physics", toggle=1)
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_lod_lights", toggle=1)
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_dis_lod_lights", toggle=1)
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_critical", toggle=1)
-        row = layout.row()
-        row.prop(obj.ymap_properties.content_flags_toggle,
-                 "has_grass", toggle=1)
 
 
 def draw_ymap_model_occluder_properties(self, context):

@@ -4,13 +4,14 @@ import math
 
 from mathutils import Vector
 from struct import pack
+
 from ..cwxml.ymap import *
 from binascii import hexlify
 from ..tools.blenderhelper import remove_number_suffix
-from ..tools.meshhelper import get_bound_center_from_bounds, get_extents, get_dimensions
-from ..sollumz_properties import SOLLUMZ_UI_NAMES, SollumType
-from ..tools.utils import get_min_vector, get_max_vector
+from ..tools.meshhelper import get_bound_center_from_bounds, get_combined_bound_box, get_extents
+from ..sollumz_properties import SOLLUMZ_UI_NAMES, EntityLodLevel, SollumType
 from ..sollumz_preferences import get_export_settings
+from ..tools.utils import get_max_vector, get_min_vector
 from .. import logger
 
 
@@ -50,7 +51,7 @@ def triangulate_obj(obj):
 def get_verts_from_obj(obj):
     """
     For each vertex get its coordinates in global space (this way we don't need to apply transfroms)
-    then get their bytes hex representation and append. After that for each face get its indices, 
+    then get their bytes hex representation and append. After that for each face get its indices,
     get their bytes hex representation and append.
 
     :return verts: String if vertex coordinates and face indices in hex representation
@@ -109,20 +110,48 @@ def entity_from_obj(obj):
 
     return entity
 
-# TODO: This needs more work for non occluder object (entities )
-
 
 def calculate_extents(ymap, obj):
-    bbmin, bbmax = get_extents(obj)
+    bbmin = Vector((0, 0, 0))
+    bbmax = Vector((0, 0, 0))
+    smin = Vector((0, 0, 0))
+    smax = Vector((0, 0, 0))
+    found = False
 
-    ymap.entities_extents_min = get_min_vector(
-        ymap.entities_extents_min, bbmin)
-    ymap.entities_extents_max = get_max_vector(
-        ymap.entities_extents_max, bbmax)
-    ymap.streaming_extents_min = get_min_vector(
-        ymap.streaming_extents_min, bbmin)
-    ymap.streaming_extents_max = get_max_vector(
-        ymap.streaming_extents_max, bbmax)
+    if obj.sollum_type == SollumType.DRAWABLE:
+        bbmin, bbmax = get_combined_bound_box(obj)
+        lod_dist = obj.entity_properties.lod_dist or 0
+        smin = bbmin - Vector((lod_dist, lod_dist, lod_dist))
+        smax = bbmax + Vector((lod_dist, lod_dist, lod_dist))
+        found = True
+
+    elif obj.sollum_type == SollumType.YMAP_CAR_GENERATOR:
+        len = obj.ymap_cargen_properties.perpendicular_length
+        bbmin = obj.location - Vector((len, len, len))
+        bbmax = obj.location + Vector((len, len, len))
+        smin = obj.location - Vector((len * 2.0, len * 2.0, len * 2.0))
+        smax = obj.location + Vector((len * 2.0, len * 2.0, len * 2.0))
+        found = True
+
+    elif obj.sollum_type == SollumType.YMAP_BOX_OCCLUDER:
+        size = round(obj.dimensions.x * 4) * 0.5
+        bbmin = obj.location - Vector((size, size, size))
+        bbmax = obj.location + Vector((size, size, size))
+        smin = bbmin
+        smax = bbmax
+        found = True
+
+    elif obj.sollum_type == SollumType.YMAP_MODEL_OCCLUDER:
+        bbmin, bbmax = get_combined_bound_box(obj)
+        smin = bbmin
+        smax = bbmax
+        found = True
+
+    if found:
+        ymap.entities_extents_min = get_min_vector(ymap.entities_extents_min, bbmin)
+        ymap.entities_extents_max = get_max_vector(ymap.entities_extents_max, bbmax)
+        ymap.streaming_extents_min = get_min_vector(ymap.streaming_extents_min, smin)
+        ymap.streaming_extents_max = get_max_vector(ymap.streaming_extents_max, smax)
 
 
 def cargen_from_obj(obj):
@@ -151,79 +180,103 @@ def calculate_cargen_orient(obj):
     return 5 * math.sin(angle), 5 * math.cos(angle)
 
 
+def calculate_flags(ymap: CMapData, script_loaded: bool = True):
+    flags = 0
+    content_flags = 0
+
+    if script_loaded:
+        flags |= 1
+
+    if len(ymap.entities) > 0:
+        for entity in ymap.entities:
+            if entity.lod_level == "LODTYPES_DEPTH_HD" or entity.lod_level == "LODTYPES_DEPTH_ORPHANHD":
+                content_flags |= 1
+
+            if entity.lod_level == "LODTYPES_DEPTH_LOD":
+                flags |= 2
+                content_flags |= 2
+
+            if entity.lod_level == "LODTYPES_DEPTH_SLOD1":
+                flags |= 2
+                content_flags |= 16
+
+            if entity.lod_level == "LODTYPES_DEPTH_SLOD2" or entity.lod_level == "LODTYPES_DEPTH_SLOD3" or entity.lod_level == EntityLodLevel.LODTYPES_DEPTH_SLOD4:
+                flags |= 2
+                content_flags |= 4
+                content_flags |= 16
+
+    return flags, content_flags
+
+
 def ymap_from_object(obj):
     ymap = CMapData()
+
+    # Default extents
     max_int = (2**31) - 1
     ymap.entities_extents_min = Vector((max_int, max_int, max_int))
-    ymap.entities_extents_max = Vector((0, 0, 0))
+    ymap.entities_extents_max = Vector((-max_int, -max_int, -max_int))
     ymap.streaming_extents_min = Vector((max_int, max_int, max_int))
-    ymap.streaming_extents_max = Vector((0, 0, 0))
+    ymap.streaming_extents_max = Vector((-max_int, -max_int, -max_int))
 
     export_settings = get_export_settings()
+    exclude_entities = export_settings.ymap_exclude_entities
+    exclude_box_occluders = export_settings.ymap_box_occluders
+    exclude_model_occluders = export_settings.ymap_model_occluders
+    exclude_cargens = export_settings.ymap_car_generators
 
     for child in obj.children:
         # Entities
-        if export_settings.ymap_exclude_entities == False and child.sollum_type == SollumType.YMAP_ENTITY_GROUP:
-            for entity in child.children:
-                if entity.sollum_type == SollumType.DRAWABLE:
-                    ymap.entities.append(entity_from_obj(entity))
+        if child.sollum_type == SollumType.YMAP_ENTITY_GROUP and not exclude_entities:
+            for entity_obj in child.children:
+                if entity_obj.sollum_type == SollumType.DRAWABLE:
+                    ymap.entities.append(entity_from_obj(entity_obj))
+                    calculate_extents(ymap, entity_obj)
                 else:
-                    logger.warning(
-                        f"Object {entity.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]} type.")
+                    logger.warning(f"Object {entity_obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]} type.")
 
         # Box occluders
-        if export_settings.ymap_box_occluders == False and child.sollum_type == SollumType.YMAP_BOX_OCCLUDER_GROUP:
-            obj.ymap_properties.content_flags_toggle.has_occl = True
-
-            for cargen in child.children:
-                if cargen.sollum_type == SollumType.YMAP_BOX_OCCLUDER:
-                    ymap.box_occluders.append(box_from_obj(cargen))
-                    calculate_extents(ymap, cargen)
+        if child.sollum_type == SollumType.YMAP_BOX_OCCLUDER_GROUP and not exclude_box_occluders:
+            for box_obj in child.children:
+                if box_obj.sollum_type == SollumType.YMAP_BOX_OCCLUDER:
+                    ymap.box_occluders.append(box_from_obj(box_obj))
+                    calculate_extents(ymap, box_obj)
                 else:
-                    logger.warning(
-                        f"Object {cargen.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_BOX_OCCLUDER]} type.")
+                    logger.warning(f"Object {box_obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_BOX_OCCLUDER]} type.")
 
         # Model occluders
-        if export_settings.ymap_model_occluders == False and child.sollum_type == SollumType.YMAP_MODEL_OCCLUDER_GROUP:
-            obj.ymap_properties.content_flags_toggle.has_occl = True
-
-            for model in child.children:
-                if model.sollum_type == SollumType.YMAP_MODEL_OCCLUDER:
-                    if len(model.data.vertices) > 256:
-                        logger.warning(
-                            f"Object {model.name} has too many vertices and will be skipped. It can not have more than 256 vertices.")
+        if child.sollum_type == SollumType.YMAP_MODEL_OCCLUDER_GROUP and not exclude_model_occluders:
+            for model_obj in child.children:
+                if model_obj.sollum_type == SollumType.YMAP_MODEL_OCCLUDER:
+                    if len(model_obj.data.vertices) > 256:
+                        logger.warning(f"Object {model_obj.name} has too many vertices and will be skipped. It can not have more than 256 vertices.")
                         continue
 
-                    ymap.occlude_models.append(
-                        model_from_obj(model))
-                    calculate_extents(ymap, model)
+                    ymap.occlude_models.append(model_from_obj(model_obj))
+                    calculate_extents(ymap, model_obj)
                 else:
-                    logger.warning(
-                        f"Object {model.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_MODEL_OCCLUDER]} type.")
-
-        # TODO: physics_dictionaries
-
-        # TODO: time cycle
+                    logger.warning(f"Object {model_obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_MODEL_OCCLUDER]} type.")
 
         # Car generators
-        if export_settings.ymap_car_generators == False and child.sollum_type == SollumType.YMAP_CAR_GENERATOR_GROUP:
-            for cargen in child.children:
-                if cargen.sollum_type == SollumType.YMAP_CAR_GENERATOR:
-                    ymap.car_generators.append(cargen_from_obj(cargen))
+        if child.sollum_type == SollumType.YMAP_CAR_GENERATOR_GROUP and not exclude_cargens:
+            for cargen_obj in child.children:
+                if cargen_obj.sollum_type == SollumType.YMAP_CAR_GENERATOR:
+                    ymap.car_generators.append(cargen_from_obj(cargen_obj))
+                    calculate_extents(ymap, cargen_obj)
                 else:
-                    logger.warning(
-                        f"Object {cargen.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_CAR_GENERATOR]} type.")
+                    logger.warning(f"Object {cargen_obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_CAR_GENERATOR]} type.")
 
+        # TODO: physics_dictionaries
+        # TODO: time cycle
         # TODO: lod ligths
-
         # TODO: distant lod lights
 
-    ymap.name = obj.name if not "." in obj.name else obj.name.split(".")[0]
+    print("Scripted?", obj.ymap_properties.script_loaded)
+    ymap.name = remove_number_suffix(obj.name)
     ymap.parent = obj.ymap_properties.parent
-    ymap.flags = obj.ymap_properties.flags
-    ymap.content_flags = obj.ymap_properties.content_flags
+    flags, content_flags = calculate_flags(ymap, obj.ymap_properties.script_loaded)
 
-    # TODO: Calc extents
+    ymap.flags = flags
+    ymap.content_flags = content_flags
 
     ymap.block.version = obj.ymap_properties.block.version
     ymap.block.versiflagson = obj.ymap_properties.block.flags
@@ -236,6 +289,8 @@ def ymap_from_object(obj):
 
 
 def export_ymap(obj: bpy.types.Object, filepath: str) -> bool:
+
+    print("Scripted?", obj.ymap_properties.script_loaded)
     ymap = ymap_from_object(obj)
     ymap.write_xml(filepath)
     return True
