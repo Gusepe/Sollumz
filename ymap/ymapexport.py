@@ -8,7 +8,7 @@ from struct import pack
 from ..cwxml.ymap import *
 from binascii import hexlify
 from ..tools.blenderhelper import remove_number_suffix
-from ..tools.meshhelper import get_bound_center_from_bounds, get_combined_bound_box, get_extents
+from ..tools.meshhelper import get_bound_center_from_bounds, get_combined_bound_box, get_extents, get_sphere_radius
 from ..sollumz_properties import SOLLUMZ_UI_NAMES, EntityLodLevel, SollumType
 from ..sollumz_preferences import get_export_settings
 from ..tools.utils import get_max_vector, get_min_vector
@@ -119,10 +119,17 @@ def calculate_extents(ymap, obj):
     found = False
 
     if obj.sollum_type == SollumType.DRAWABLE:
-        bbmin, bbmax = get_combined_bound_box(obj)
+        bs_center = get_bound_center_from_bounds(bbmin, bbmax)
+        bs_radius = get_sphere_radius(bbmax, bs_center)
         lod_dist = obj.entity_properties.lod_dist or 0
+
+        bbmin = obj.location - Vector((bs_radius, bs_radius, bs_radius))
+        bbmax = obj.location + Vector((bs_radius, bs_radius, bs_radius))
         smin = bbmin - Vector((lod_dist, lod_dist, lod_dist))
         smax = bbmax + Vector((lod_dist, lod_dist, lod_dist))
+
+        bbmin, bbmax = get_combined_bound_box(obj)
+
         found = True
 
     elif obj.sollum_type == SollumType.YMAP_CAR_GENERATOR:
