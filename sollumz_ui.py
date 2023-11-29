@@ -637,12 +637,7 @@ class SOLLUMZ_PT_OBJECT_PANEL(bpy.types.Panel):
 
         obj = context.active_object
         row = layout.row()
-        row.enabled = False
-        row.prop(obj, "sollum_type")
-
-        if not obj or obj.sollum_type == SollumType.NONE:
-            layout.label(
-                text="No sollumz objects in scene selected.", icon="ERROR")
+        row.prop(obj, "sollum_type", text="")
 
 
 class SOLLUMZ_PT_ENTITY_PANEL(bpy.types.Panel):

@@ -546,8 +546,7 @@ class SOLLUMZ_OT_debug_set_sollum_type(SOLLUMZ_OT_base, bpy.types.Operator):
         sel_sollum_type = context.scene.all_sollum_type
         for obj in context.selected_objects:
             obj.sollum_type = sel_sollum_type
-        self.message(
-            f"Sollum Type successfuly set to {SOLLUMZ_UI_NAMES[sel_sollum_type]}.")
+        self.message(f"New type: {SOLLUMZ_UI_NAMES[sel_sollum_type]}.")
         return True
 
 
