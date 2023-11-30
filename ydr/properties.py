@@ -65,8 +65,16 @@ class TextureFlags(bpy.types.PropertyGroup):
     unk24: bpy.props.BoolProperty(name="UNK24", default=False)
 
 
+def update_property(self, context):
+    for area in bpy.context.screen.areas:
+        if area.type == 'PROPERTIES':
+            for region in area.regions:
+                if region.type == 'WINDOW':
+                    region.tag_redraw()
+
+
 class TextureProperties(bpy.types.PropertyGroup):
-    embedded: bpy.props.BoolProperty(name="Embedded", default=False)
+    embedded: bpy.props.BoolProperty(name="Embedded", default=False, update=update_property)
     usage: bpy.props.EnumProperty(
         items=items_from_enums(TextureUsage),
         name="Usage",
