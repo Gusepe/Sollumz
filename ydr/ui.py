@@ -169,10 +169,10 @@ class SOLLUMZ_PT_SHADER_TOOLS_PANEL(bpy.types.Panel):
     bl_region_type = "UI"
     bl_options = {"DEFAULT_CLOSED"}
     bl_parent_id = SOLLUMZ_PT_DRAWABLE_TOOL_PANEL.bl_idname
- 
+
     def draw_header(self, context):
         self.layout.label(text="", icon="TOOL_SETTINGS")
- 
+
     def draw(self, context):
         layout = self.layout
         layout.label(text="Create")
@@ -187,10 +187,10 @@ class SOLLUMZ_PT_SHADER_TOOLS_PANEL(bpy.types.Panel):
                       text="Convert Active Material", icon="FILE_REFRESH")
         grid.operator(
             ydr_ops.SOLLUMZ_OT_convert_allmaterials_to_selected.bl_idname, text="Convert All Materials")
- 
+
         layout.separator()
         layout.label(text="Tools")
- 
+
         row = layout.row()
         row.operator(
             ydr_ops.SOLLUMZ_OT_auto_convert_material.bl_idname, text="Auto Convert", icon="FILE_REFRESH")
@@ -324,16 +324,11 @@ class SOLLUMZ_PT_TXTPARAMS_PANEL(bpy.types.Panel):
     bl_region_type = "WINDOW"
     bl_options = {"DEFAULT_CLOSED"}
     bl_parent_id = SOLLUMZ_PT_MAT_PANEL.bl_idname
-    bl_order = 0
+    bl_order = 1
 
     @classmethod
     def poll(cls, context):
-        obj = context.active_object
-        if obj:
-            mat = obj.active_material
-            return mat and mat.sollum_type != MaterialType.NONE and mat.sollum_type != MaterialType.COLLISION
-        else:
-            return False
+        return context.active_object is not None and context.active_object.active_material is not None and context.active_object.active_material.sollum_type == MaterialType.SHADER
 
     def draw(self, context):
         layout = self.layout
@@ -350,57 +345,32 @@ class SOLLUMZ_PT_TXTPARAMS_PANEL(bpy.types.Panel):
         for n in nodes:
             if isinstance(n, bpy.types.ShaderNodeTexImage) and n.is_sollumz:
                 box = layout.box()
-                row = box.row(align=True)
-                row.label(text="Texture Type: " + n.name)
-                row.label(text="Texture Name: " + n.sollumz_texture_name)
-                if n.image:
-                    row = box.row()
-                    row.prop(n.image, "filepath", text="Texture Path")
-                else:
-                    row = box.row()
-                    row.label(
-                        text="Image Texture has no linked image.", icon="ERROR")
-                row = box.row(align=True)
-                row.prop(n.texture_properties, "embedded")
-                if n.texture_properties.embedded == False:
-                    continue
-                row.prop(n.texture_properties, "format")
-                row.prop(n.texture_properties, "usage")
-                box.label(text="Flags")
-                row = box.row()
-                row.prop(n.texture_flags, "not_half")
-                row.prop(n.texture_flags, "hd_split")
-                row.prop(n.texture_flags, "flag_full")
-                row.prop(n.texture_flags, "maps_half")
-                row = box.row()
-                row.prop(n.texture_flags, "x2")
-                row.prop(n.texture_flags, "x4")
-                row.prop(n.texture_flags, "y4")
-                row.prop(n.texture_flags, "x8")
-                row = box.row()
-                row.prop(n.texture_flags, "x16")
-                row.prop(n.texture_flags, "x32")
-                row.prop(n.texture_flags, "x64")
-                row.prop(n.texture_flags, "y64")
-                row = box.row()
-                row.prop(n.texture_flags, "x128")
-                row.prop(n.texture_flags, "x256")
-                row.prop(n.texture_flags, "x512")
-                row.prop(n.texture_flags, "y512")
-                row = box.row()
-                row.prop(n.texture_flags, "x1024")
-                row.prop(n.texture_flags, "y1024")
-                row.prop(n.texture_flags, "x2048")
-                row.prop(n.texture_flags, "y2048")
-                row = box.row()
-                row.prop(n.texture_flags, "embeddedscriptrt")
-                row.prop(n.texture_flags, "unk19")
-                row.prop(n.texture_flags, "unk20")
-                row.prop(n.texture_flags, "unk21")
-                row = box.row()
-                row.prop(n.texture_flags, "unk24")
-                row.prop(n.texture_properties, "extra_flags")
+                box.label(text=n.name)
 
+                # Image node input
+                box.template_ID(n, "image", open="image.open")
+
+                # New column - Embedd
+                split = box.split(align=True)
+                col = split.column(align=False)
+                if n.texture_properties.embedded:
+                    text = "Embedded"
+                else:
+                    text = "Not embedded"
+                col.prop(n.texture_properties, "embedded", text=text)
+
+                # New column - Colorspace
+                if n.image is not None and n.image.filepath != "":
+                    col = split.column(align=False)
+                    col.enabled = True
+                    col.prop(n.image.colorspace_settings, "name", text="")
+                else:
+                    col = split.column(align=False)
+                    col.enabled = False
+
+                # New column - Texture usage
+                col = split.column(align=False)
+                col.prop(n.texture_properties, "usage", text="")
 
 class SOLLUMZ_PT_VALUEPARAMS_PANEL(bpy.types.Panel):
     bl_label = "Value Parameters"
