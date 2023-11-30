@@ -45,8 +45,7 @@ class SOLLUMZ_OT_create_drawable(SOLLUMZ_OT_base, bpy.types.Operator):
                             if child.type == "MESH":
                                 child.location -= dobjs[index].location
 
-            self.message(
-                f"Succesfully converted {', '.join([obj.name for obj in context.selected_objects])} to a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]}.")
+            self.message(f"Succesfully converted {', '.join([obj.name for obj in context.selected_objects])} to a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]}.")
             return True
         else:
             obj = create_drawable(drawable_type)
@@ -102,8 +101,7 @@ class MaterialConverterHelper:
                 if new_material is None:
                     continue
 
-                self.report(
-                    {"INFO"}, f"Successfuly converted material '{new_material.name}'.")
+                self.report({"INFO"}, f"Successfuly converted material '{new_material.name}'.")
 
         return {"FINISHED"}
 
@@ -178,10 +176,10 @@ class SOLLUMZ_OT_create_shader_material(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Sets all textures to embedded on the selected objects active material"""
+    """Embedd all textures in active materials from selected objects"""
     bl_idname = "sollumz.setallembedded"
-    bl_label = "Set all Textures Embedded"
-    bl_action = "Set all Textures Embedded"
+    bl_label = "Embedded active"
+    bl_action = "Embedded active"
 
     def set_textures_embedded(self, obj):
         mat = obj.active_material
@@ -193,17 +191,14 @@ class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
             for node in mat.node_tree.nodes:
                 if isinstance(node, bpy.types.ShaderNodeTexImage):
                     node.texture_properties.embedded = True
-            self.message(
-                f"Set {obj.name}s material {mat.name} textures to embedded.")
+            self.message(f"Set {obj.name} material {mat.name} textures to embedded.")
         else:
-            self.message(
-                f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+            self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if len(objs) == 0:
-            self.warning(
-                f"Please select a object to set all textures embedded.")
+            self.warning(f"Please select a object to set all textures embedded.")
             return False
 
         for obj in objs:
@@ -213,10 +208,10 @@ class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Sets all materials to embedded"""
+    """Embedd all textures in all materials from selected objects"""
     bl_idname = "sollumz.setallmatembedded"
-    bl_label = "Set all Materials Embedded"
-    bl_action = "Set All Materials Embedded"
+    bl_label = "Embedded all"
+    bl_action = "Embedded all"
 
     def set_materials_embedded(self, obj):
         for mat in obj.data.materials:
@@ -224,17 +219,14 @@ class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator)
                 for node in mat.node_tree.nodes:
                     if isinstance(node, bpy.types.ShaderNodeTexImage):
                         node.texture_properties.embedded = True
-                self.message(
-                    f"Set {obj.name}s material {mat.name} textures to embedded.")
+                self.message(f"Set {obj.name} materials {mat.name} textures to embedded.")
             else:
-                self.message(
-                    f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+                self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if len(objs) == 0:
-            self.warning(
-                f"Please select a object to set all textures embedded.")
+            self.warning(f"Please select a object to set all textures embedded.")
             return False
 
         for obj in objs:
@@ -244,10 +236,10 @@ class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator)
 
 
 class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Remove all embeded textures on the selected objects active material"""
+    """Unembedd all textures in active material from selected objects"""
     bl_idname = "sollumz.removeallembedded"
-    bl_label = "Remove all Embeded Textures"
-    bl_action = "Remove all Embeded Textures"
+    bl_label = "Unembeded active"
+    bl_action = "Unembeded active"
 
     def set_textures_unembedded(self, obj):
         mat = obj.active_material
@@ -259,17 +251,14 @@ class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operato
             for node in mat.node_tree.nodes:
                 if (isinstance(node, bpy.types.ShaderNodeTexImage)):
                     node.texture_properties.embedded = False
-            self.message(
-                f"Set {obj.name}s material {mat.name} textures to unembedded.")
+            self.message(f"Set {obj.name}s material {mat.name} textures to unembedded.")
         else:
-            self.message(
-                f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+            self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if (len(objs) == 0):
-            self.warning(
-                f"Please select a object to remove all embeded textures.")
+            self.warning(f"Please select a object to remove all embeded textures.")
             return False
 
         for obj in objs:
@@ -277,12 +266,11 @@ class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operato
 
         return True
 
-
 class SOLLUMZ_OT_unset_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Make all materials on the selected object use non-embedded textures"""
+    """Unembedd all textures in all materials from selected objects"""
     bl_idname = "sollumz.removeallmatembedded"
-    bl_label = "Set all Materials Unembedded"
-    bl_action = "Set all Materials Unembedded"
+    bl_label = "Unembedded all"
+    bl_action = "Unembedded all"
 
     def set_materials_unembedded(self, obj):
         for mat in obj.data.materials:
@@ -290,17 +278,14 @@ class SOLLUMZ_OT_unset_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operato
                 for node in mat.node_tree.nodes:
                     if (isinstance(node, bpy.types.ShaderNodeTexImage)):
                         node.texture_properties.embedded = False
-                self.message(
-                    f"Set {obj.name}s materials to unembedded.")
+                self.message(f"Set {obj.name}s materials to unembedded.")
             else:
-                self.message(
-                    f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+                self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if (len(objs) == 0):
-            self.warning(
-                f"Please select a object to remove all embedded materials.")
+            self.warning(f"Please select a object to remove all embedded materials.")
             return False
 
         for obj in objs:
