@@ -705,11 +705,11 @@ class FlagsPanel:
         data_block = self.get_flags(context)
         self.layout.prop(data_block, "total")
         self.layout.separator()
-        grid = self.layout.grid_flow(columns=2)
+        grid = self.layout.grid_flow(columns=2, align=True)
         for index, prop_name in enumerate(data_block.__annotations__):
             if index > data_block.size - 1:
                 break
-            grid.prop(data_block, prop_name)
+            grid.prop(data_block, prop_name, toggle=True)
 
 
 class TimeFlagsPanel(FlagsPanel):
