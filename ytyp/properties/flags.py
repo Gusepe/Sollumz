@@ -177,69 +177,133 @@ class EntityFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
 
 class ArchetypeFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
     flag1: bpy.props.BoolProperty(
-        name="Unknown 1", update=FlagPropertyGroup.update_flag)
+        name="1 - Wet Road Reflection",
+        description="Old name: Unknown 1",
+        update=FlagPropertyGroup.update_flag)
     flag2: bpy.props.BoolProperty(
-        name="Unknown 2", update=FlagPropertyGroup.update_flag)
+        name="2 - Dont Fade",
+        description="Old name: Unknown 2",
+        update=FlagPropertyGroup.update_flag)
     flag3: bpy.props.BoolProperty(
-        name="Unknown 3", update=FlagPropertyGroup.update_flag)
+        name="4 - Draw Last",
+        description="Old name: Unknown 3",
+        update=FlagPropertyGroup.update_flag)
     flag4: bpy.props.BoolProperty(
-        name="Unknown 4", update=FlagPropertyGroup.update_flag)
+        name="8 - Climbable By AI",
+        description="Old name: Unknown 4",
+        update=FlagPropertyGroup.update_flag)
     flag5: bpy.props.BoolProperty(
-        name="Unknown 5", update=FlagPropertyGroup.update_flag)
+        name="16 - Suppress HD TXDs",
+        description="Old name: Unknown 5",
+        update=FlagPropertyGroup.update_flag)
     flag6: bpy.props.BoolProperty(
-        name="Static", update=FlagPropertyGroup.update_flag)
+        name="32 - Static",
+        description="Old name: Static",
+        update=FlagPropertyGroup.update_flag)
     flag7: bpy.props.BoolProperty(
-        name="Unknown 7", update=FlagPropertyGroup.update_flag)
+        name="64 - Disable alpha sorting",
+        description="Old name: Unknown 7",
+        update=FlagPropertyGroup.update_flag)
     flag8: bpy.props.BoolProperty(
-        name="Instance", update=FlagPropertyGroup.update_flag)
+        name="128 - Tough For Bullets",
+        description="Old name: Instance",
+        update=FlagPropertyGroup.update_flag)
     flag9: bpy.props.BoolProperty(
-        name="Unknown 9", update=FlagPropertyGroup.update_flag)
+        name="256 - Is Generic",
+        description="Old name: Unknown 9",
+        update=FlagPropertyGroup.update_flag)
     flag10: bpy.props.BoolProperty(
-        name="Bone anims (YCD)", update=FlagPropertyGroup.update_flag)
+        name="512 - Has Anim (YCD)",
+        description="Old name: Bone anims (YCD)",
+        update=FlagPropertyGroup.update_flag)
     flag11: bpy.props.BoolProperty(
-        name="UV anims (YCD)", update=FlagPropertyGroup.update_flag)
+        name="1024 - UV anims (YCD)",
+        description="Old name: UV anims (YCD)",
+        update=FlagPropertyGroup.update_flag)
     flag12: bpy.props.BoolProperty(
-        name="Invisible but blocks lights/shadows", update=FlagPropertyGroup.update_flag)
+        name="2048 - Shadow Only",
+        description="Old name: Invisible but blocks lights/shadows",
+        update=FlagPropertyGroup.update_flag)
     flag13: bpy.props.BoolProperty(
-        name="Unknown 13", update=FlagPropertyGroup.update_flag)
+        name="4096 - Damage Model",
+        description="Old name: Unknown 13",
+        update=FlagPropertyGroup.update_flag)
     flag14: bpy.props.BoolProperty(
-        name="Object won't cast shadow", update=FlagPropertyGroup.update_flag)
+        name="8192 - Dont Cast Shadows",
+        description="Old name: Object won't cast shadow",
+        update=FlagPropertyGroup.update_flag)
     flag15: bpy.props.BoolProperty(
-        name="Unknown 15", update=FlagPropertyGroup.update_flag)
+        name="16384 - Cast Texture Shadows",
+        description="Old name: Unknown 15",
+        update=FlagPropertyGroup.update_flag)
     flag16: bpy.props.BoolProperty(
-        name="Unknown 16", update=FlagPropertyGroup.update_flag)
+        name="32768 - Dont Collide With Flyer",
+        description="Old name: Unknown 16",
+        update=FlagPropertyGroup.update_flag)
     flag17: bpy.props.BoolProperty(
-        name="Double-sided rendering", update=FlagPropertyGroup.update_flag)
+        name="65536 - Double-sided rendering",
+        description="Old name: Double-sided rendering",
+        update=FlagPropertyGroup.update_flag)
     flag18: bpy.props.BoolProperty(
-        name="Dynamic", update=FlagPropertyGroup.update_flag)
+        name="131072 - Dynamic",
+        description="Old name: Dynamic",
+        update=FlagPropertyGroup.update_flag)
     flag19: bpy.props.BoolProperty(
-        name="Unknown 19", update=FlagPropertyGroup.update_flag)
+        name="262144 - Override Physics Bounds",
+        description="Old name: Unknown 19",
+        update=FlagPropertyGroup.update_flag)
     flag20: bpy.props.BoolProperty(
-        name="Unknown 20", update=FlagPropertyGroup.update_flag)
+        name="524288 - Auto Start Anim",
+        description="Old name: Unknown 20",
+        update=FlagPropertyGroup.update_flag)
     flag21: bpy.props.BoolProperty(
-        name="Unknown 21", update=FlagPropertyGroup.update_flag)
+        name="1048576 - Has Pre Reflected Water Proxy",
+        description="Old name: Unknown 21",
+        update=FlagPropertyGroup.update_flag)
     flag22: bpy.props.BoolProperty(
-        name="Unknown 22", update=FlagPropertyGroup.update_flag)
+        name="2097152 - Has Drawable Proxy For Water Reflections",
+        description="Old name: Unknown 22",
+        update=FlagPropertyGroup.update_flag)
     flag23: bpy.props.BoolProperty(
-        name="Unknown 23", update=FlagPropertyGroup.update_flag)
+        name="4194304 - Does Not Provide AI Cover",
+        description="Old name: Unknown 23",
+        update=FlagPropertyGroup.update_flag)
     flag24: bpy.props.BoolProperty(
-        name="Unknown 24", update=FlagPropertyGroup.update_flag)
+        name="8388608 - Does Not Provide Player Cover",
+        description="Old name: Unknown 24",
+        update=FlagPropertyGroup.update_flag)
     flag25: bpy.props.BoolProperty(
-        name="Unknown 25", update=FlagPropertyGroup.update_flag)
+        name="16777216 - Is Ladder Deprecated",
+        description="Old name: Unknown 25",
+        update=FlagPropertyGroup.update_flag)
     flag26: bpy.props.BoolProperty(
-        name="Unknown 26", update=FlagPropertyGroup.update_flag)
+        name="33554432 - Has Cloth",
+        description="Old name: Unknown 26",
+        update=FlagPropertyGroup.update_flag)
     flag27: bpy.props.BoolProperty(
-        name="Enables special attribute", update=FlagPropertyGroup.update_flag)
+        name="67108864 - Enable Door Physics",
+        description="Old name: Enables special attribute",
+        update=FlagPropertyGroup.update_flag)
     flag28: bpy.props.BoolProperty(
-        name="Unknown 28", update=FlagPropertyGroup.update_flag)
+        name="134217728 - Is Fixed For Navigation",
+        description="Old name: Unknown 28",
+        update=FlagPropertyGroup.update_flag)
     flag29: bpy.props.BoolProperty(
-        name="Disable red vertex channel", update=FlagPropertyGroup.update_flag)
+        name="268435456 -  Dont Avoid By Peds",
+        description="Old name: Disable red vertex channel",
+        update=FlagPropertyGroup.update_flag)
     flag30: bpy.props.BoolProperty(
-        name="Disable green vertex channel", update=FlagPropertyGroup.update_flag)
+        name="536870912 - Use Ambient Scale",
+        description="Old name: Disable green vertex channel",
+        update=FlagPropertyGroup.update_flag)
     flag31: bpy.props.BoolProperty(
-        name="Disable blue vertex channel", update=FlagPropertyGroup.update_flag)
+        name="1073741824 - Is Debug",
+        description="Old name: Disable blue vertex channel",
+        update=FlagPropertyGroup.update_flag)
     flag32: bpy.props.BoolProperty(
-        name="Disable alpha vertex channel", update=FlagPropertyGroup.update_flag)
+        name="2147483648 - Has Alpha Shadow",
+        description="Old name: Disable alpha vertex channel",
+        update=FlagPropertyGroup.update_flag)
 
 
 class UnknownFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
