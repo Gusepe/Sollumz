@@ -21,9 +21,9 @@ def draw_collision_material_properties(self, context):
 
 
 def generate_flags(layout, prop):
-    grid = layout.grid_flow(columns=4, even_columns=True, even_rows=True)
+    grid = layout.grid_flow(columns=4, even_columns=True, even_rows=True, align=True)
     for prop_name in BoundFlags.__annotations__:
-        grid.prop(prop, prop_name)
+        grid.prop(prop, prop_name, toggle=True)
 
 
 def draw_bound_properties(self, context):
