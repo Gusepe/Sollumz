@@ -4,7 +4,7 @@ import pathlib
 import bpy
 import re
 from bpy_extras.io_utils import ImportHelper
-from .sollumz_helper import SOLLUMZ_OT_base
+from .sollumz_helper import SOLLUMZ_OT_base, find_sollumz_parent
 from .sollumz_properties import SollumType, SOLLUMZ_UI_NAMES, BOUND_TYPES, SollumzExportSettings, SollumzImportSettings, TimeFlags, ArchetypeType
 from .cwxml.drawable import YDR, YDD
 from .cwxml.fragment import YFT
@@ -185,12 +185,19 @@ class SOLLUMZ_OT_export(SOLLUMZ_OT_base, bpy.types.Operator):
     def get_filepath(self, name, ext):
         return os.path.join(self.make_directory(name), name + ext) if self.export_settings.use_batch_own_dir else os.path.join(self.directory, name + ext)
 
-    def get_only_parent_objs(self, objs):
-        pobjs = []
+    def get_only_parent_objs(self, objs: list[bpy.types.Object]):
+        parent_objs = set()
+        objs = set(objs)
+
         for obj in objs:
-            if obj.parent is None or obj.parent.type == 'EMPTY':
-                pobjs.append(obj)
-        return pobjs
+            parent_obj = find_sollumz_parent(obj)
+
+            if parent_obj is None or parent_obj in parent_objs:
+                continue
+
+            parent_objs.add(parent_obj)
+
+        return list(parent_objs)
 
     def collect_objects(self, context):
         mode = self.export_settings.batch_mode
@@ -243,8 +250,7 @@ class SOLLUMZ_OT_export(SOLLUMZ_OT_base, bpy.types.Operator):
                 if any(bound_type.value in types for bound_type in BOUND_TYPES):
                     result.append(obj)
             else:
-                if obj.sollum_type in types:
-                    result.append(obj)
+                result.append(obj)
 
         return result
 

@@ -2,9 +2,10 @@ import bpy
 import traceback
 import os
 import time
+from typing import Optional
 from abc import abstractmethod
 from .tools.blenderhelper import get_children_recursive, get_object_with_children
-from .sollumz_properties import BOUND_TYPES
+from .sollumz_properties import BOUND_TYPES, SollumType
 from .ydr.ydrexport import get_used_materials
 
 
@@ -128,3 +129,20 @@ def duplicate_object_with_children(obj):
     for new_obj in new_objs:
         bpy.context.scene.collection.objects.link(new_obj)
     return new_objs[0]
+
+
+def find_sollumz_parent(obj: bpy.types.Object, parent_type: Optional[SollumType] = None) -> bpy.types.Object | None:
+    """Find parent Fragment or Drawable if one exists. Returns None otherwise."""
+    parent_types = [SollumType.FRAGMENT, SollumType.DRAWABLE, SollumType.DRAWABLE_DICTIONARY,
+                    SollumType.CLIP_DICTIONARY, SollumType.YMAP, *BOUND_TYPES]
+
+    if parent_type is not None and obj.parent is not None and obj.parent.sollum_type == parent_type:
+        return obj.parent
+
+    if obj.parent is None and obj.sollum_type in parent_types:
+        return obj
+
+    if obj.parent is None:
+        return None
+
+    return find_sollumz_parent(obj.parent, parent_type)
