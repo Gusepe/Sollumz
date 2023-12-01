@@ -137,7 +137,7 @@ class SOLLUMZ_OT_export(SOLLUMZ_OT_base, bpy.types.Operator):
     direct_export: bpy.props.BoolProperty(
         name="Direct Export",
         description="Export directly to the output directory without opening the directory selection dialog.",
-        options={"HIDDEN", "SKIP_SAVE"}
+        options={"HIDDEN"}
     )
 
     def invoke(self, context, event):
