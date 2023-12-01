@@ -306,68 +306,28 @@ class ArchetypeFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
         update=FlagPropertyGroup.update_flag)
 
 
-class UnknownFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
+class MloInstanceFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
     flag1: bpy.props.BoolProperty(
-        name="Unknown 1", update=FlagPropertyGroup.update_flag)
+        name="1 - Gps on",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
     flag2: bpy.props.BoolProperty(
-        name="Unknown 2", update=FlagPropertyGroup.update_flag)
+        name="2 - Cap contents alpha",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
     flag3: bpy.props.BoolProperty(
-        name="Unknown 3", update=FlagPropertyGroup.update_flag)
+        name="4 - Short fade",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
     flag4: bpy.props.BoolProperty(
-        name="Unknown 4", update=FlagPropertyGroup.update_flag)
+        name="8 - Special behaviour 1",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
     flag5: bpy.props.BoolProperty(
-        name="Unknown 5", update=FlagPropertyGroup.update_flag)
+        name="16 - Special behaviour 2",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
     flag6: bpy.props.BoolProperty(
-        name="Unknown 6", update=FlagPropertyGroup.update_flag)
-    flag7: bpy.props.BoolProperty(
-        name="Unknown 7", update=FlagPropertyGroup.update_flag)
-    flag8: bpy.props.BoolProperty(
-        name="Unknown 8", update=FlagPropertyGroup.update_flag)
-    flag9: bpy.props.BoolProperty(
-        name="Unknown 9", update=FlagPropertyGroup.update_flag)
-    flag10: bpy.props.BoolProperty(
-        name="Unknown 10", update=FlagPropertyGroup.update_flag)
-    flag11: bpy.props.BoolProperty(
-        name="Unknown 11", update=FlagPropertyGroup.update_flag)
-    flag12: bpy.props.BoolProperty(
-        name="Unknown 12", update=FlagPropertyGroup.update_flag)
-    flag13: bpy.props.BoolProperty(
-        name="Unknown 13", update=FlagPropertyGroup.update_flag)
-    flag14: bpy.props.BoolProperty(
-        name="Unknown 14", update=FlagPropertyGroup.update_flag)
-    flag15: bpy.props.BoolProperty(
-        name="Unknown 15", update=FlagPropertyGroup.update_flag)
-    flag16: bpy.props.BoolProperty(
-        name="Unknown 16", update=FlagPropertyGroup.update_flag)
-    flag17: bpy.props.BoolProperty(
-        name="Unknown 17", update=FlagPropertyGroup.update_flag)
-    flag18: bpy.props.BoolProperty(
-        name="Unknown 18", update=FlagPropertyGroup.update_flag)
-    flag19: bpy.props.BoolProperty(
-        name="Unknown 19", update=FlagPropertyGroup.update_flag)
-    flag20: bpy.props.BoolProperty(
-        name="Unknown 20", update=FlagPropertyGroup.update_flag)
-    flag21: bpy.props.BoolProperty(
-        name="Unknown 21", update=FlagPropertyGroup.update_flag)
-    flag22: bpy.props.BoolProperty(
-        name="Unknown 22", update=FlagPropertyGroup.update_flag)
-    flag23: bpy.props.BoolProperty(
-        name="Unknown 23", update=FlagPropertyGroup.update_flag)
-    flag24: bpy.props.BoolProperty(
-        name="Unknown 24", update=FlagPropertyGroup.update_flag)
-    flag25: bpy.props.BoolProperty(
-        name="Unknown 25", update=FlagPropertyGroup.update_flag)
-    flag26: bpy.props.BoolProperty(
-        name="Unknown 26", update=FlagPropertyGroup.update_flag)
-    flag27: bpy.props.BoolProperty(
-        name="Unknown 27", update=FlagPropertyGroup.update_flag)
-    flag28: bpy.props.BoolProperty(
-        name="Unknown 28", update=FlagPropertyGroup.update_flag)
-    flag29: bpy.props.BoolProperty(
-        name="Unknown 29", update=FlagPropertyGroup.update_flag)
-    flag30: bpy.props.BoolProperty(
-        name="Unknown 30", update=FlagPropertyGroup.update_flag)
-    flag31: bpy.props.BoolProperty(
-        name="Unknown 31", update=FlagPropertyGroup.update_flag)
-    flag32: bpy.props.BoolProperty(
-        name="Unknown 32", update=FlagPropertyGroup.update_flag)
+        name="32 - Special behaviour 3",
+        description="No description yet",
+        update=FlagPropertyGroup.update_flag)
