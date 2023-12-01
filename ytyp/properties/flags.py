@@ -6,25 +6,45 @@ class RoomFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
     size = 10
 
     flag1: bpy.props.BoolProperty(
-        name="Unknown 1", update=FlagPropertyGroup.update_flag)
+        name="1 - Freeze vehicles",
+        description="Old name: Unknown 1",
+        update=FlagPropertyGroup.update_flag)
     flag2: bpy.props.BoolProperty(
-        name="Disables wanted level", update=FlagPropertyGroup.update_flag)
+        name="2 - Freeze peds",
+        description="Old name: Disables wanted level",
+        update=FlagPropertyGroup.update_flag)
     flag3: bpy.props.BoolProperty(
-        name="Disable exterior shadows", update=FlagPropertyGroup.update_flag)
+        name="4 - No directional light",
+        description="Old name: Disable exterior shadows",
+        update=FlagPropertyGroup.update_flag)
     flag4: bpy.props.BoolProperty(
-        name="Unknown 4", update=FlagPropertyGroup.update_flag)
+        name="8 - No exterior lights",
+        description="Old name: Unknown 4",
+        update=FlagPropertyGroup.update_flag)
     flag5: bpy.props.BoolProperty(
-        name="Unknown 5", update=FlagPropertyGroup.update_flag)
+        name="16 - Force freeze",
+        description="Old name: Unknown 5",
+        update=FlagPropertyGroup.update_flag)
     flag6: bpy.props.BoolProperty(
-        name="Reduces vehicle population", update=FlagPropertyGroup.update_flag)
+        name="32 - Reduce cars",
+        description="Old name: Reduces vehicle population",
+        update=FlagPropertyGroup.update_flag)
     flag7: bpy.props.BoolProperty(
-        name="Reduces ped population", update=FlagPropertyGroup.update_flag)
+        name="64 - Reduce peds",
+        description="Old name: Reduces ped population",
+        update=FlagPropertyGroup.update_flag)
     flag8: bpy.props.BoolProperty(
-        name="Unknown 8", update=FlagPropertyGroup.update_flag)
+        name="128 - Force directional light ON",
+        description="Old name: Unknown 8",
+        update=FlagPropertyGroup.update_flag)
     flag9: bpy.props.BoolProperty(
-        name="Disable limbo portals", update=FlagPropertyGroup.update_flag)
+        name="256 - Don't render exterior",
+        description="Old name: Disable limbo portals",
+        update=FlagPropertyGroup.update_flag)
     flag10: bpy.props.BoolProperty(
-        name="Unknown 10", update=FlagPropertyGroup.update_flag)
+        name="512 - Mirror potentially visible",
+        description="Old name: Unknown 10",
+        update=FlagPropertyGroup.update_flag)
 
 
 class PortalFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
