@@ -176,10 +176,10 @@ class SOLLUMZ_OT_create_shader_material(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Embedd all textures in active materials from selected objects"""
+    """Embed all textures in active materials from selected objects"""
     bl_idname = "sollumz.setallembedded"
-    bl_label = "Embedded active"
-    bl_action = "Embedded active"
+    bl_label = "Embed active"
+    bl_action = "Embed active"
 
     def set_textures_embedded(self, obj):
         mat = obj.active_material
@@ -208,10 +208,10 @@ class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Embedd all textures in all materials from selected objects"""
+    """Embed all textures in all materials from selected objects"""
     bl_idname = "sollumz.setallmatembedded"
-    bl_label = "Embedded all"
-    bl_action = "Embedded all"
+    bl_label = "Embed all"
+    bl_action = "Embed all"
 
     def set_materials_embedded(self, obj):
         for mat in obj.data.materials:
@@ -236,10 +236,10 @@ class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator)
 
 
 class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Unembedd all textures in active material from selected objects"""
+    """Unembed all textures in active material from selected objects"""
     bl_idname = "sollumz.removeallembedded"
-    bl_label = "Unembeded active"
-    bl_action = "Unembeded active"
+    bl_label = "Unembed active"
+    bl_action = "Unembed active"
 
     def set_textures_unembedded(self, obj):
         mat = obj.active_material
@@ -267,10 +267,10 @@ class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operato
         return True
 
 class SOLLUMZ_OT_unset_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Unembedd all textures in all materials from selected objects"""
+    """Unembed all textures in all materials from selected objects"""
     bl_idname = "sollumz.removeallmatembedded"
-    bl_label = "Unembedded all"
-    bl_action = "Unembedded all"
+    bl_label = "Unembed all"
+    bl_action = "Unembed all"
 
     def set_materials_unembedded(self, obj):
         for mat in obj.data.materials:
