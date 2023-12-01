@@ -31,33 +31,61 @@ class PortalFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
     size = 14
 
     flag1: bpy.props.BoolProperty(
-        name="Disables exterior rendering", update=FlagPropertyGroup.update_flag)
+        name="1 - One way",
+        description="Disable interior rendering when standing outside.\nOld name: Disables exterior rendering",
+        update=FlagPropertyGroup.update_flag)
     flag2: bpy.props.BoolProperty(
-        name="Disables interior rendering", update=FlagPropertyGroup.update_flag)
+        name="2 - Link",
+        description="Can be used to as invert compare to previous flag.\nOld name: Disables interior rendering",
+        update=FlagPropertyGroup.update_flag)
     flag3: bpy.props.BoolProperty(
-        name="Mirror", update=FlagPropertyGroup.update_flag)
+        name="4 - Mirror",
+        description="",
+        update=FlagPropertyGroup.update_flag)
     flag4: bpy.props.BoolProperty(
-        name="Extra bloom", update=FlagPropertyGroup.update_flag)
+        name="8 - Ignore modifier",
+        description="Old name: Extra bloom",
+        update=FlagPropertyGroup.update_flag)
     flag5: bpy.props.BoolProperty(
-        name="Unknown 5", update=FlagPropertyGroup.update_flag)
+        name="16 - Mirror using expensive shaders",
+        description="",
+        update=FlagPropertyGroup.update_flag)
     flag6: bpy.props.BoolProperty(
-        name="Use exterior LOD", update=FlagPropertyGroup.update_flag)
+        name="32 - Low LOD only",
+        description="Old name: Use exterior LOD",
+        update=FlagPropertyGroup.update_flag)
     flag7: bpy.props.BoolProperty(
-        name="Hide when door closed", update=FlagPropertyGroup.update_flag)
+        name="64 - Allow closing",
+        description="Portal will be disabled if an attached entity is closed.\nOld name: Hide when door closed",
+        update=FlagPropertyGroup.update_flag)
     flag8: bpy.props.BoolProperty(
-        name="Unknown 8", update=FlagPropertyGroup.update_flag)
+        name="128 - Mirror can see directional light",
+        description="Old name: Unknown 8",
+        update=FlagPropertyGroup.update_flag)
     flag9: bpy.props.BoolProperty(
-        name="Mirror exterior portals", update=FlagPropertyGroup.update_flag)
+        name="256 - Mirror using portal traversal",
+        description="Old name: Mirror exterior portals",
+        update=FlagPropertyGroup.update_flag)
     flag10: bpy.props.BoolProperty(
-        name="Unknown 10", update=FlagPropertyGroup.update_flag)
+        name="512 - Mirror floor",
+        description="Old name: Unknown 10",
+        update=FlagPropertyGroup.update_flag)
     flag11: bpy.props.BoolProperty(
-        name="Mirror limbo entities", update=FlagPropertyGroup.update_flag)
+        name="1024 - Mirror can see exterior view",
+        description="Old name: Mirror limbo entities",
+        update=FlagPropertyGroup.update_flag)
     flag12: bpy.props.BoolProperty(
-        name="Unknown 12", update=FlagPropertyGroup.update_flag)
+        name="2048 - Water surface",
+        description="Old name: Unknown 12",
+        update=FlagPropertyGroup.update_flag)
     flag13: bpy.props.BoolProperty(
-        name="Unknown 13", update=FlagPropertyGroup.update_flag)
+        name="4096 - Water surface extend to horizon",
+        description="Old name: Unknown 13",
+        update=FlagPropertyGroup.update_flag)
     flag14: bpy.props.BoolProperty(
-        name="Disable farclipping", update=FlagPropertyGroup.update_flag)
+        name="8192 - Use light bleed",
+        description="Old name: Disable farclipping",
+        update=FlagPropertyGroup.update_flag)
 
 
 class EntityFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
