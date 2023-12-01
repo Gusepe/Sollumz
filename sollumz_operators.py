@@ -134,9 +134,18 @@ class SOLLUMZ_OT_export(SOLLUMZ_OT_base, bpy.types.Operator):
         subtype="DIR_PATH",
     )
 
+    direct_export: bpy.props.BoolProperty(
+        name="Direct Export",
+        description="Export directly to the output directory without opening the directory selection dialog.",
+        options={"HIDDEN", "SKIP_SAVE"}
+    )
+
     def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {"RUNNING_MODAL"}
+        if self.direct_export:
+            return self.execute(context)
+        else:
+            context.window_manager.fileselect_add(self)
+            return {"RUNNING_MODAL"}
 
     def draw(self, context):
         pass

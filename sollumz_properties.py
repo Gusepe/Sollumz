@@ -938,6 +938,13 @@ def register():
     bpy.types.Scene.debug_lights_only_selected = bpy.props.BoolProperty(
         name="Limit to Selected", description="Only set intensity of the selected lights. (All instances will be affected)")
 
+    bpy.types.Scene.sollumz_export_path = bpy.props.StringProperty(
+        name="Export Path",
+        default="",
+        description="The path where files will be exported. If not set, the export dialog will be opened",
+        subtype="DIR_PATH",
+    )
+
     bpy.utils.register_class(SollumzAddonPreferences)
 
 
@@ -961,5 +968,6 @@ def unregister():
     del bpy.types.Scene.all_sollum_type
     del bpy.types.Scene.create_center_to_selection
     del bpy.types.Scene.debug_lights_only_selected
+    del bpy.types.Scene.sollumz_export_path
 
     bpy.utils.unregister_class(SollumzAddonPreferences)
