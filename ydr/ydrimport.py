@@ -1,15 +1,15 @@
 from math import pi, radians
-import bmesh
 import os
 import bpy
 from mathutils import Matrix, Vector
 from .shader_materials import create_shader, create_tinted_shader_graph, get_detail_extra_sampler
 from ..ybn.ybnimport import composite_to_obj, bound_to_obj
 from ..sollumz_properties import SOLLUMZ_UI_NAMES, LODLevel, TextureFormat, TextureUsage, SollumType, LightType
-from ..cwxml.drawable import YDR, Drawable
+from ..cwxml.drawable import YDR
 from ..tools.meshhelper import create_uv_layer, create_vertexcolor_layer
 from ..tools.blenderhelper import build_tag_bone_map, remove_unused_vertex_groups_of_mesh, join_objects, remove_unused_materials, get_addon_preferences
 from ..tools.drawablehelper import join_drawable_geometries, drawable_to_asset
+from .render_bucket import RenderBucket
 
 BONE_TAIL_POS = (0, 0.05, 0)
 
@@ -28,7 +28,7 @@ def shadergroup_to_materials(shadergroup, filepath):
 
         material = create_shader(filename)
 
-        material.shader_properties.renderbucket = shader.render_bucket
+        material.shader_properties.renderbucket = RenderBucket(shader.render_bucket).name
         material.shader_properties.filename = shader.filename
 
         for param in shader.parameters:

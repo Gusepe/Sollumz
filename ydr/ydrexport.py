@@ -28,6 +28,7 @@ from ..ybn.ybnexport import bound_from_object, composite_from_object
 from math import degrees, pi, isclose
 from mathutils import Quaternion, Vector
 from dataclasses import dataclass
+from .render_bucket import RenderBucket
 
 
 def get_used_materials(obj):
@@ -50,7 +51,7 @@ def get_shaders_from_blender(materials):
         # Maybe make this a property?
         shader.name = material.shader_properties.name
         shader.filename = material.shader_properties.filename
-        shader.render_bucket = material.shader_properties.renderbucket
+        shader.render_bucket = RenderBucket[material.shader_properties.renderbucket].value
 
         for node in material.node_tree.nodes:
             if isinstance(node, bpy.types.ShaderNodeTexImage):

@@ -3,6 +3,7 @@ from ..tools.version import USE_LEGACY
 from ..cwxml.shader import ShaderManager
 from ..sollumz_properties import MaterialType
 from collections import namedtuple
+from .render_bucket import RenderBucket
 
 ShaderMaterial = namedtuple("ShaderMaterial", "name, ui_name, value")
 
@@ -825,7 +826,7 @@ def create_shader(filename: str):
     mat.use_nodes = True
     mat.shader_properties.name = base_name
     mat.shader_properties.filename = filename
-    mat.shader_properties.renderbucket = shader.render_buckets[0]
+    mat.shader_properties.renderbucket = RenderBucket(shader.render_buckets[0]).name
 
     if filename in ShaderManager.terrains:
         create_terrain_shader(mat, shader, filename)
