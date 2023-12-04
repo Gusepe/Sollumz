@@ -98,6 +98,7 @@ class SOLLUMZ_PT_import_main(bpy.types.Panel):
 
         layout.prop(operator.import_settings, "batch_mode")
         layout.prop(operator.import_settings, "import_as_asset")
+        layout.prop(operator.import_settings, "ignore_embedded_col")
 
 
 class SOLLUMZ_PT_import_geometry(bpy.types.Panel):

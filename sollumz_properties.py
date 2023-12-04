@@ -528,6 +528,12 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
         default=False,
     )
 
+    ignore_embedded_col: bpy.props.BoolProperty(
+        name="Ignore Embedded Collisions",
+        description="Exclude embedded collision when importing .ydr/.yft files.",
+        default=False,
+    )
+
     join_geometries: bpy.props.BoolProperty(
         name="Join Geometries",
         description="Joins the drawables geometries into a single mesh.",

@@ -574,7 +574,7 @@ def drawable_to_obj(drawable, filepath, name, bones_override=None, materials=Non
     if bones_override is not None:
         bones = bones_override
 
-    if drawable.bounds:
+    if drawable.bounds and import_settings.ignore_embedded_col == False:
         for bound in drawable.bounds:
             bobj = None
             if bound.type == "Composite":
