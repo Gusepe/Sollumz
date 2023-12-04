@@ -524,19 +524,19 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
 
     import_as_asset: bpy.props.BoolProperty(
         name="Import as asset",
-        description="Create an asset from the .ydr/.yft high LOD.",
+        description="Create an asset from the .ydr/.yft high LOD",
         default=False,
     )
 
     ignore_embedded_col: bpy.props.BoolProperty(
         name="Ignore Embedded Collisions",
-        description="Exclude embedded collision when importing .ydr/.yft files.",
+        description="Exclude embedded collision when importing .ydr/.yft files",
         default=False,
     )
 
     join_geometries: bpy.props.BoolProperty(
         name="Join Geometries",
-        description="Joins the drawables geometries into a single mesh.",
+        description="Joins the drawables geometries into a single mesh",
         default=False,
     )
 
@@ -548,48 +548,48 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
 
     import_ext_skeleton: bpy.props.BoolProperty(
         name="Import External Skeleton",
-        description="Imports the first found yft skeleton in the same folder as the selected file.",
+        description="Imports the first found yft skeleton in the same folder as the selected file",
         default=False,
     )
 
     selected_armature: bpy.props.IntProperty(
         name="Armature",
-        description="Armature on which the animation will be applied.",
+        description="Armature on which the animation will be applied",
         default=-1,
     )
 
     ymap_skip_missing_entities: bpy.props.BoolProperty(
         name="Skip Missing Entities",
-        description="If enabled, missing entities wont be created as an empty object.",
+        description="If enabled, missing entities wont be created as an empty object",
         default=True,
     )
 
     ymap_exclude_entities: bpy.props.BoolProperty(
         name="Exclude Entities",
-        description="If enabled, ignore all entities from the selected ymap(s).",
+        description="If enabled, ignore all entities from the selected ymap(s)",
         default=False,
     )
 
     ymap_box_occluders: bpy.props.BoolProperty(
         name="Exclude Box Occluders",
-        description="If enabled, ignore all Box occluders from the selected ymap(s).",
+        description="If enabled, ignore all Box occluders from the selected ymap(s)",
         default=False,
     )
 
     ymap_model_occluders: bpy.props.BoolProperty(
         name="Exclude Model Occluders",
-        description="If enabled, ignore all Model occluders from the selected ymap(s).",
+        description="If enabled, ignore all Model occluders from the selected ymap(s)",
         default=False,
     )
 
     ymap_car_generators: bpy.props.BoolProperty(
         name="Exclude Car Generators",
-        description="If enabled, ignore all Car Generators from the selected ymap(s).",
+        description="If enabled, ignore all Car Generators from the selected ymap(s)",
         default=False,
     )
     ymap_instance_entities: bpy.props.BoolProperty(
         name="Instance Entities",
-        description="If enabled, instance all entities from the selected ymap(s).",
+        description="If enabled, instance all entities from the selected ymap(s)",
         default=False,
     )
 

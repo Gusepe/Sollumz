@@ -10,10 +10,16 @@ def draw_drawable_properties(self, context):
     obj = context.active_object
     if obj and obj.sollum_type == SollumType.DRAWABLE:
         layout = self.layout
-        layout.prop(obj.drawable_properties, "lod_dist_high")
-        layout.prop(obj.drawable_properties, "lod_dist_med")
-        layout.prop(obj.drawable_properties, "lod_dist_low")
-        layout.prop(obj.drawable_properties, "lod_dist_vlow")
+        drawable_props = obj.drawable_properties
+
+        col = layout.column(align=True)
+        col.use_property_decorate = False
+        col.use_property_split = True
+
+        col.prop(drawable_props, "lod_dist_high", text="Lod Distance High")
+        col.prop(drawable_props, "lod_dist_med", text="Med")
+        col.prop(drawable_props, "lod_dist_low", text="Low")
+        col.prop(drawable_props, "lod_dist_vlow", text="Vlow")
 
 
 def draw_drawable_model_properties(self, context):
