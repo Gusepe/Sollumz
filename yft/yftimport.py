@@ -54,7 +54,7 @@ def fragment_to_obj(frag_xml: Fragment, filepath: str):
             create_bounds(lod_xml, child_objs)
             create_vehicle_windows(frag_xml, materials, child_objs)
 
-            lod_obj.parent = frag_objvvv
+            lod_obj.parent = frag_obj
 
 
 def create_lod_obj(frag_obj: bpy.types.Object, lod_xml: LOD, id: int):
