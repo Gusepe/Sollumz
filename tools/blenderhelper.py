@@ -292,3 +292,12 @@ def create_empty_object(sollum_type: SollumType, name: str = None) -> bpy.types.
     bpy.context.collection.objects.link(obj)
 
     return obj
+
+def tag_redraw(context: bpy.types.Context, space_type: str = "PROPERTIES", region_type: str = "WINDOW"):
+    """Redraw all panels in the given space_type and region_type"""
+    for window in context.window_manager.windows:
+        for area in window.screen.areas:
+            if area.spaces[0].type == space_type:
+                for region in area.regions:
+                    if region.type == region_type:
+                        region.tag_redraw()
