@@ -37,7 +37,7 @@ def get_used_materials(obj):
         if child.sollum_type == SollumType.DRAWABLE_GEOMETRY:
             mats = child.data.materials
             for mat in mats:
-                if mat.sollum_type == MaterialType.SHADER:
+                if mat is not None and mat.sollum_type == MaterialType.SHADER:
                     if mat not in materials:
                         materials.append(mat)
     return materials
