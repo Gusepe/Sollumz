@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TextureDictionary>
+ <Item>
+  <Name>car0</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>car0.dds</FileName>
+ </Item>
+ <Item>
+  <Name>car1</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>car1.dds</FileName>
+ </Item>
+ <Item>
+  <Name>car2</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>car2.dds</FileName>
+ </Item>
+ <Item>
+  <Name>loc1</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>Y64, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="128" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>loc1.dds</FileName>
+ </Item>
+ <Item>
+  <Name>loc0</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>Y64, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="128" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>loc0.dds</FileName>
+ </Item>
+ <Item>
+  <Name>loc2</Name>
+  <Unk32 value="48" />
+  <Usage>DEFAULT</Usage>
+  <UsageFlags>Y64, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="128" />
+  <MipLevels value="1" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>loc2.dds</FileName>
+ </Item>
+</TextureDictionary>

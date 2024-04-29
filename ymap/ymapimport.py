@@ -3,20 +3,20 @@ import struct
 import math
 import os
 import bpy
+import bmesh
 
 from mathutils import Vector, Euler
-from ..sollumz_helper import duplicate_object_with_children, set_object_collection
-from ..tools.ymaphelper import add_occluder_material
+from ..sollumz_helper import duplicate_object_with_children, set_object_collection, mesh_join, hide_set_obj_and_children, delete_obj_and_children
+from ..tools.ymaphelper import *
 from ..sollumz_properties import SollumType
 from ..cwxml.ymap import CMapData, OccludeModel, YMAP
-
-# TODO: Make better?
-
+from ..cwxml.drawable import YDR
+from ..ydr.ydrimport import drawable_to_obj
 
 def get_mesh_data(model: OccludeModel):
     result = ([], [])
     for i in range(int(model.num_verts_in_bytes / 12)):
-        pos_data: str = model.verts[i * 24:(i * 24) + 24]
+        pos_data: str = model.verts[i*24:(i*24)+24]
         x = struct.unpack('<f', binascii.a2b_hex(pos_data[:8]))[0]
         y = struct.unpack('<f', binascii.a2b_hex(pos_data[8:16]))[0]
         z = struct.unpack('<f', binascii.a2b_hex(pos_data[16:24]))[0]
@@ -24,14 +24,13 @@ def get_mesh_data(model: OccludeModel):
 
     indicies: str = model.verts[int(model.num_verts_in_bytes * 2):]
     for i in range(int(model.num_tris - 32768)):
-        j = i * 6
-        i0 = int.from_bytes(binascii.a2b_hex(indicies[j:j + 2]), 'little')
-        i1 = int.from_bytes(binascii.a2b_hex(indicies[j + 2:j + 4]), 'little')
-        i2 = int.from_bytes(binascii.a2b_hex(indicies[j + 4:j + 6]), 'little')
+        j = i*6
+        i0 = int.from_bytes(binascii.a2b_hex(indicies[j:j+2]), 'little')
+        i1 = int.from_bytes(binascii.a2b_hex(indicies[j+2:j+4]), 'little')
+        i2 = int.from_bytes(binascii.a2b_hex(indicies[j+4:j+6]), 'little')
         result[1].append((i0, i1, i2))
 
     return result
-
 
 def apply_entity_properties(obj, entity):
     obj.entity_properties.archetype_name = entity.archetype_name
@@ -55,35 +54,7 @@ def apply_entity_properties(obj, entity):
 
 
 def entity_to_obj(self, ymap_obj: bpy.types.Object, ymap: CMapData, import_settings):
-    group_obj = bpy.data.objects.new("Entities", None)
-    group_obj.sollum_type = SollumType.YMAP_ENTITY_GROUP
-    group_obj.parent = ymap_obj
-    group_obj.lock_location = (True, True, True)
-    group_obj.lock_rotation = (True, True, True)
-    group_obj.lock_scale = (True, True, True)
-    bpy.context.collection.objects.link(group_obj)
-    bpy.context.view_layer.objects.active = group_obj
-
-    found = False
-    if ymap.entities:
-        for obj in bpy.context.collection.all_objects:
-            for entity in ymap.entities:
-                if entity.archetype_name == obj.name and obj.name in bpy.context.view_layer.objects:
-                    found = True
-                    apply_entity_properties(obj, entity)
-        if found:
-            self.message(f"Succesfully imported: {self.filepath}")
-            return True
-        else:
-            self.message(
-                f"No entities from '{self.filepath}' exist in the view layer!")
-            return False
-    else:
-        self.error(f"{self.filepath} contains no entities to import!")
-        return False
-
-
-def instanced_entity_to_obj(self, ymap_obj: bpy.types.Object, ymap: CMapData, import_settings):
+    
     group_obj = bpy.data.objects.new("Entities", None)
     group_obj.sollum_type = SollumType.YMAP_ENTITY_GROUP
     group_obj.parent = ymap_obj
@@ -97,10 +68,12 @@ def instanced_entity_to_obj(self, ymap_obj: bpy.types.Object, ymap: CMapData, im
         entities_amount = len(ymap.entities)
         count = 0
 
+        # Cloning 'context.view_layer.objects' to prevent infinite loop
         existing_objects = []
         for obj in bpy.context.view_layer.objects:
             existing_objects.append(obj)
 
+        # Looping trough existing objects, if found in ymap, then dupplicate and place in specific ymap collection
         for obj in existing_objects:
             for entity in ymap.entities:
                 if entity.archetype_name == obj.name:
@@ -114,6 +87,7 @@ def instanced_entity_to_obj(self, ymap_obj: bpy.types.Object, ymap: CMapData, im
                         self.error(
                             f"Cannot use your '{obj.name}' object because it is not a 'Drawable' type!")
 
+        # Creating empty entity if no object was found for reference, and notify user
         if not import_settings.ymap_skip_missing_entities:
             for entity in ymap.entities:
                 if entity.found is None:
@@ -184,8 +158,7 @@ def model_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
         model_obj = bpy.data.objects.new("Model", mesh)
         model_obj.sollum_type = SollumType.YMAP_MODEL_OCCLUDER
         model_obj.ymap_properties.flags = model.flags
-        model_obj.active_material = add_occluder_material(
-            SollumType.YMAP_MODEL_OCCLUDER)
+        model_obj.active_material = add_occluder_material(SollumType.YMAP_MODEL_OCCLUDER)
         bpy.context.collection.objects.link(model_obj)
         bpy.context.view_layer.objects.active = model_obj
         mesh.from_pydata(verts, [], faces)
@@ -194,7 +167,72 @@ def model_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
         model_obj.lock_rotation = (True, True, True)
         model_obj.lock_scale = (True, True, True)
 
+def grass_to_obj(obj: bpy.types.Object, ymap: CMapData, import_settings):
 
+    group_obj = bpy.data.objects.new('Grass Instances', None)
+    group_obj.parent = obj
+
+    bpy.context.collection.objects.link(group_obj)
+    bpy.context.view_layer.objects.active = group_obj
+
+    group_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCED_DATA
+
+    obj.ymap_properties.content_flags_toggle.has_grass = True
+    
+    i=0
+    l_gil=len(ymap.instanced_data.GrassInstanceList)
+    for instance in ymap.instanced_data.GrassInstanceList:
+        
+        print('processing instance ' + str(i+1) + '/' + str(l_gil))
+        
+        subgroup_obj = bpy.data.objects.new('Grass instance', None)
+        subgroup_obj.parent = group_obj
+        subgroup_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE_LIST_DEF
+        #subgroup_obj.location = instance.BatchAABB.get_center()
+        #subgroup_obj.scale = instance.ScaleRange
+        
+        subgroup_obj.ymap_grass_instance_list_properties.scaleRange       = instance.ScaleRange
+        subgroup_obj.ymap_grass_instance_list_properties.archetypeName    = instance.archetypeName
+        subgroup_obj.ymap_grass_instance_list_properties.lodDist          = instance.lodDist
+        subgroup_obj.ymap_grass_instance_list_properties.lodFadeStartDist = instance.LodFadeStartDist
+        subgroup_obj.ymap_grass_instance_list_properties.lodInstFadeRange = instance.LodInstFadeRange
+        subgroup_obj.ymap_grass_instance_list_properties.orientToTerrain  = instance.OrientToTerrain
+        
+        bpy.context.collection.objects.link(subgroup_obj)
+        bpy.context.view_layer.objects.active = subgroup_obj
+        
+        for x in instance.InstanceList:
+            
+            base_obj = ensure_grass_proc_model(instance.archetypeName)
+            
+            model_obj = base_obj.copy()
+            model_obj.rotation_mode = 'QUATERNION'
+            
+            model_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE
+            
+            model_obj.ymap_grass_instance_list_item_properties.position = x.Position
+            model_obj.ymap_grass_instance_list_item_properties.normalX = x.NormalX
+            model_obj.ymap_grass_instance_list_item_properties.normalY = x.NormalY
+            model_obj.ymap_grass_instance_list_item_properties.color = [y/255 for y in x.Color]
+            model_obj.ymap_grass_instance_list_item_properties.scale = x.Scale/255
+            model_obj.ymap_grass_instance_list_item_properties.ao = x.Ao/255
+            model_obj.ymap_grass_instance_list_item_properties.pad = x.Pad
+            
+            bpy.context.collection.objects.link(model_obj)
+            bpy.context.view_layer.objects.active = model_obj
+            model_obj.parent = subgroup_obj
+            model_obj.location = x.get_world_pos(instance.BatchAABB)# - subgroup_obj.location
+            
+            normal_x = (x.NormalX / 255) * 2 - 1
+            normal_y = (x.NormalY / 255) * 2 - 1
+            normal_z = math.sqrt(1 - normal_x ** 2 + normal_y ** 2)
+            
+            model_obj.rotation_quaternion = Vector((normal_x, normal_y, normal_z)).normalized().to_track_quat('Z', 'Y')
+            
+            model_obj.scale = Vector((1, 1, 1)) * (x.Scale/255)
+    
+        i += 1
+            
 def cargen_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
     group_obj = bpy.data.objects.new("Car Generators", None)
     group_obj.sollum_type = SollumType.YMAP_CAR_GENERATOR_GROUP
@@ -205,11 +243,12 @@ def cargen_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
     bpy.context.collection.objects.link(group_obj)
     bpy.context.view_layer.objects.active = group_obj
 
-    cargen_ref_mesh = import_cargen_mesh()
+    file_loc = os.path.join(os.path.dirname(__file__), "car_model.obj")
 
     for cargen in ymap.car_generators:
-        cargen_obj = bpy.data.objects.new(
-            "Car Generator", object_data=cargen_ref_mesh)
+        bpy.ops.import_scene.obj(filepath=file_loc)
+        cargen_obj = bpy.context.selected_objects[0]
+        cargen_obj.name = "Car Generator"
         cargen_obj.ymap_cargen_properties.orient_x = cargen.orient_x
         cargen_obj.ymap_cargen_properties.orient_y = cargen.orient_y
         cargen_obj.ymap_cargen_properties.perpendicular_length = cargen.perpendicular_length
@@ -223,22 +262,11 @@ def cargen_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
         cargen_obj.ymap_cargen_properties.livery = cargen.livery
 
         angl = math.atan2(cargen.orient_x, cargen.orient_y)
-        cargen_obj.rotation_euler = Euler((0.0, 0.0, angl * -1))
+        cargen_obj.rotation_euler = Euler((0.0, 0.0, angl*-1))
 
         cargen_obj.location = cargen.position
         cargen_obj.sollum_type = SollumType.YMAP_CAR_GENERATOR
         cargen_obj.parent = group_obj
-
-
-def import_cargen_mesh() -> bpy.types.Mesh:
-    file_loc = os.path.join(os.path.dirname(__file__), "car_model.obj")
-    bpy.ops.import_scene.obj(filepath=file_loc)
-    cargen_ref_obj = bpy.context.selected_objects[0]
-    mesh = cargen_ref_obj.data
-
-    bpy.data.objects.remove(cargen_ref_obj)
-
-    return mesh
 
 
 def ymap_to_obj(import_op, ymap: CMapData, import_settings):
@@ -262,11 +290,8 @@ def ymap_to_obj(import_op, ymap: CMapData, import_settings):
 
     # Entities
     # TODO: find a way to retrieve ignored stuff on export
-    if ymap.entities and not import_settings.ymap_exclude_entities:
-        if import_settings.ymap_instance_entities and ymap.entities:
-            instanced_entity_to_obj(import_op, ymap_obj, ymap, import_settings)
-        elif ymap.entities:
-            entity_to_obj(import_op, ymap_obj, ymap, import_settings)
+    if import_settings.ymap_exclude_entities == False and len(ymap.entities) > 0:
+        entity_to_obj(import_op, ymap_obj, ymap, import_settings)
 
     # Box occluders
     if import_settings.ymap_box_occluders == False and len(ymap.box_occluders) > 0:
@@ -275,6 +300,10 @@ def ymap_to_obj(import_op, ymap: CMapData, import_settings):
     # Model occluders
     if import_settings.ymap_model_occluders == False and len(ymap.occlude_models) > 0:
         model_to_obj(import_op, ymap_obj, ymap)
+
+    # Grass instances
+    if import_settings.ymap_instanced_data == False:
+        grass_to_obj(ymap_obj, ymap, import_settings)
 
     # TODO: physics_dictionaries
 
@@ -287,6 +316,7 @@ def ymap_to_obj(import_op, ymap: CMapData, import_settings):
     # TODO: lod ligths
 
     # TODO: distant lod lights
+    
 
     ymap_obj.ymap_properties.block.version = str(ymap.block.version)
     ymap_obj.ymap_properties.block.flags = str(ymap.block.flags)

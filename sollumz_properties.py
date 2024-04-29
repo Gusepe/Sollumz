@@ -55,8 +55,10 @@ class SollumType(str, Enum):
     YMAP_BOX_OCCLUDER = "sollumz_ymap_box_occluder"
     YMAP_MODEL_OCCLUDER = "sollumz_ymap_model_occluder"
     YMAP_CAR_GENERATOR = "sollumz_ymap_car_generator"
-
-
+    YMAP_GRASS_INSTANCED_DATA = "sollumz_ymap_grass_instanced_data"
+    YMAP_GRASS_INSTANCE_LIST_DEF = "sollumz_ymap_grass_instance_list_def"
+    YMAP_GRASS_INSTANCE = "sollumz_ymap_grass_instance"
+    
 class LightType(str, Enum):
     NONE = "sollumz_light_none"
     POINT = "sollumz_light_point"
@@ -267,6 +269,9 @@ SOLLUMZ_UI_NAMES = {
     SollumType.YMAP_BOX_OCCLUDER: "Box Occluder",
     SollumType.YMAP_MODEL_OCCLUDER: "Model Occluder",
     SollumType.YMAP_CAR_GENERATOR: "Car Generator",
+    SollumType.YMAP_GRASS_INSTANCED_DATA: "Grass instanced data",
+    SollumType.YMAP_GRASS_INSTANCE_LIST_DEF: "Grass instance list def",
+    SollumType.YMAP_GRASS_INSTANCE: "Grass instance",
 
     MaterialType.NONE: "None",
     MaterialType.SHADER: "Sollumz Material",
@@ -413,7 +418,6 @@ time_items = [("0", "12:00 AM", ""),
 
 
 class TimeFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
-    size = 24
     hour1: bpy.props.BoolProperty(
         name="12:00 AM - 1:00 AM", update=FlagPropertyGroup.update_flag)
     hour2: bpy.props.BoolProperty(
@@ -462,6 +466,22 @@ class TimeFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
         name="10:00 PM - 11:00 PM", update=FlagPropertyGroup.update_flag)
     hour24: bpy.props.BoolProperty(
         name="11:00 PM - 12:00 AM", update=FlagPropertyGroup.update_flag)
+    unk1: bpy.props.BoolProperty(
+        name="Unknown 1", update=FlagPropertyGroup.update_flag)
+    unk2: bpy.props.BoolProperty(
+        name="Unknown 2", update=FlagPropertyGroup.update_flag)
+    unk3: bpy.props.BoolProperty(
+        name="Unknown 3", update=FlagPropertyGroup.update_flag)
+    unk4: bpy.props.BoolProperty(
+        name="Unknown 4", update=FlagPropertyGroup.update_flag)
+    unk5: bpy.props.BoolProperty(
+        name="Unknown 5", update=FlagPropertyGroup.update_flag)
+    unk6: bpy.props.BoolProperty(
+        name="Unknown 6", update=FlagPropertyGroup.update_flag)
+    unk7: bpy.props.BoolProperty(
+        name="Unknown 7", update=FlagPropertyGroup.update_flag)
+    unk8: bpy.props.BoolProperty(
+        name="Unknown 8", update=FlagPropertyGroup.update_flag)
 
     time_flags_start: bpy.props.EnumProperty(
         items=time_items, name="Time Start")
@@ -509,19 +529,13 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
 
     import_as_asset: bpy.props.BoolProperty(
         name="Import as asset",
-        description="Create an asset from the .ydr/.yft high LOD",
-        default=False,
-    )
-
-    ignore_embedded_col: bpy.props.BoolProperty(
-        name="Ignore Embedded Collisions",
-        description="Exclude embedded collision when importing .ydr/.yft files",
+        description="Create an asset from the .ydr/.yft high LOD.",
         default=False,
     )
 
     join_geometries: bpy.props.BoolProperty(
         name="Join Geometries",
-        description="Joins the drawables geometries into a single mesh",
+        description="Joins the drawables geometries into a single mesh.",
         default=False,
     )
 
@@ -533,48 +547,49 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
 
     import_ext_skeleton: bpy.props.BoolProperty(
         name="Import External Skeleton",
-        description="Imports the first found yft skeleton in the same folder as the selected file",
+        description="Imports the first found yft skeleton in the same folder as the selected file.",
         default=False,
     )
 
     selected_armature: bpy.props.IntProperty(
         name="Armature",
-        description="Armature on which the animation will be applied",
+        description="Armature on which the animation will be applied.",
         default=-1,
     )
 
     ymap_skip_missing_entities: bpy.props.BoolProperty(
         name="Skip Missing Entities",
-        description="If enabled, missing entities wont be created as an empty object",
+        description="If enabled, missing entities wont be created as an empty object.",
         default=True,
     )
 
     ymap_exclude_entities: bpy.props.BoolProperty(
         name="Exclude Entities",
-        description="If enabled, ignore all entities from the selected ymap(s)",
+        description="If enabled, ignore all entities from the selected ymap(s).",
         default=False,
     )
 
     ymap_box_occluders: bpy.props.BoolProperty(
         name="Exclude Box Occluders",
-        description="If enabled, ignore all Box occluders from the selected ymap(s)",
+        description="If enabled, ignore all Box occluders from the selected ymap(s).",
         default=False,
     )
 
     ymap_model_occluders: bpy.props.BoolProperty(
         name="Exclude Model Occluders",
-        description="If enabled, ignore all Model occluders from the selected ymap(s)",
+        description="If enabled, ignore all Model occluders from the selected ymap(s).",
         default=False,
     )
 
     ymap_car_generators: bpy.props.BoolProperty(
         name="Exclude Car Generators",
-        description="If enabled, ignore all Car Generators from the selected ymap(s)",
+        description="If enabled, ignore all Car Generators from the selected ymap(s).",
         default=False,
     )
-    ymap_instance_entities: bpy.props.BoolProperty(
-        name="Instance Entities",
-        description="If enabled, instance all entities from the selected ymap(s)",
+    
+    ymap_instanced_data: bpy.props.BoolProperty(
+        name="Exclude Grass Instances",
+        description="If enabled, ignore all Grass Instances from the selected ymap(s).",
         default=False,
     )
 
@@ -692,6 +707,13 @@ class SollumzExportSettings(bpy.types.PropertyGroup):
         description="If enabled, ignore all Car Generators from the selected ymap(s).",
         default=False,
     )
+    
+    ymap_instanced_data: bpy.props.BoolProperty(
+        name="Exclude Grass Instances",
+        description="If enabled, ignore all Grass Instances from the selected ymap(s).",
+        default=False,
+    )
+
 
 
 class SollumzAddonPreferences(bpy.types.AddonPreferences):
@@ -929,13 +951,6 @@ def register():
     bpy.types.Scene.debug_lights_only_selected = bpy.props.BoolProperty(
         name="Limit to Selected", description="Only set intensity of the selected lights. (All instances will be affected)")
 
-    bpy.types.Scene.sollumz_export_path = bpy.props.StringProperty(
-        name="Export Path",
-        default="",
-        description="The path where files will be exported. If not set, the export dialog will be opened",
-        subtype="DIR_PATH",
-    )
-
     bpy.utils.register_class(SollumzAddonPreferences)
 
 
@@ -959,6 +974,5 @@ def unregister():
     del bpy.types.Scene.all_sollum_type
     del bpy.types.Scene.create_center_to_selection
     del bpy.types.Scene.debug_lights_only_selected
-    del bpy.types.Scene.sollumz_export_path
 
     bpy.utils.unregister_class(SollumzAddonPreferences)

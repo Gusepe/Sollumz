@@ -277,7 +277,6 @@ def create_archetype_xml(archetype: ArchetypeProperties) -> ytypxml.BaseArchetyp
 
     if archetype.type == ArchetypeType.MLO:
         archetype_xml = ytypxml.MloArchetype()
-        archetype_xml.mlo_flags = archetype.mlo_flags.total
         create_mlo_archetype_children_xml(archetype, archetype_xml)
     else:
         if archetype.type == ArchetypeType.TIME:

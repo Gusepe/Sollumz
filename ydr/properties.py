@@ -1,7 +1,6 @@
 import bpy
 from ..sollumz_properties import SOLLUMZ_UI_NAMES, items_from_enums, TextureUsage, TextureFormat, LODLevel, SollumType, LightType, FlagPropertyGroup, TimeFlags
 from ..ydr.shader_materials import shadermats, ShaderMaterial
-from .render_bucket import RenderBucket, RenderBucketEnumItems
 from bpy.app.handlers import persistent
 from bpy.path import basename
 
@@ -31,10 +30,7 @@ class DrawableModelProperties(bpy.types.PropertyGroup):
 
 
 class ShaderProperties(bpy.types.PropertyGroup):
-    renderbucket: bpy.props.EnumProperty(
-        name="Render Bucket", items=RenderBucketEnumItems,
-        default=RenderBucket.OPAQUE.name
-    )
+    renderbucket: bpy.props.IntProperty(name="Render Bucket", default=0)
     filename: bpy.props.StringProperty(
         name="Shader Filename", default="default.sps")
     name: bpy.props.StringProperty(name="Shader Name", default="default")
@@ -69,16 +65,8 @@ class TextureFlags(bpy.types.PropertyGroup):
     unk24: bpy.props.BoolProperty(name="UNK24", default=False)
 
 
-def update_property(self, context):
-    for area in bpy.context.screen.areas:
-        if area.type == 'PROPERTIES':
-            for region in area.regions:
-                if region.type == 'WINDOW':
-                    region.tag_redraw()
-
-
 class TextureProperties(bpy.types.PropertyGroup):
-    embedded: bpy.props.BoolProperty(name="Embedded", default=False, update=update_property)
+    embedded: bpy.props.BoolProperty(name="Embedded", default=False)
     usage: bpy.props.EnumProperty(
         items=items_from_enums(TextureUsage),
         name="Usage",
@@ -150,133 +138,69 @@ class LightProperties(bpy.types.PropertyGroup):
 
 class LightFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
     unk1: bpy.props.BoolProperty(
-        name="Unk1",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk1", update=FlagPropertyGroup.update_flag)
     unk2: bpy.props.BoolProperty(
-        name="Unk2",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk2", update=FlagPropertyGroup.update_flag)
     unk3: bpy.props.BoolProperty(
-        name="Unk3",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk3", update=FlagPropertyGroup.update_flag)
     unk4: bpy.props.BoolProperty(
-        name="Unk4",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk4", update=FlagPropertyGroup.update_flag)
     unk5: bpy.props.BoolProperty(
-        name="Ignore Artificial Lights State",
-        description="Force light to be on.\nThe native 'SET_ARTIFICIAL_LIGHTS_STATE(BOOL state)' won't affect it",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk5", update=FlagPropertyGroup.update_flag)
     unk6: bpy.props.BoolProperty(
-        name="Unk6",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk6", update=FlagPropertyGroup.update_flag)
     unk7: bpy.props.BoolProperty(
-        name="Unk7",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk7", update=FlagPropertyGroup.update_flag)
     shadows: bpy.props.BoolProperty(
-        name="Shadows Static",
-        description="Enable shadows for static entities\nExample: walls, floors, etc..",
-        update=FlagPropertyGroup.update_flag)
+        name="ShadowS", update=FlagPropertyGroup.update_flag)
     shadowd: bpy.props.BoolProperty(
-        name="Shadows Dynamic",
-        description="Enable shadows for dynamic entities.\nExample: peds, vehicles, etc..",
-        update=FlagPropertyGroup.update_flag)
+        name="ShadowD", update=FlagPropertyGroup.update_flag)
     sunlight: bpy.props.BoolProperty(
-        name="Sunlight",
-        description="The color and intensity will depend on the time of the day.\nThis will override the light color",
-        update=FlagPropertyGroup.update_flag)
+        name="Sunlight", update=FlagPropertyGroup.update_flag)
     unk11: bpy.props.BoolProperty(
-        name="Enable Buzzing",
-        description="Not sure what that means? Probably related to the next flag",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk11", update=FlagPropertyGroup.update_flag)
     electric: bpy.props.BoolProperty(
-        name="Electric sound",
-        description="Play an electric sound from the light source",
-        update=FlagPropertyGroup.update_flag)
+        name="Electric", update=FlagPropertyGroup.update_flag)
     volume: bpy.props.BoolProperty(
-        name="Volume",
-        description="Force volumetric effect rendering, ignoring timecycle",
-        update=FlagPropertyGroup.update_flag)
+        name="Volume", update=FlagPropertyGroup.update_flag)
     specoff: bpy.props.BoolProperty(
-        name="No Specular",
-        description="Disable specular effect from the light on near surfaces",
-        update=FlagPropertyGroup.update_flag)
+        name="SpecOff", update=FlagPropertyGroup.update_flag)
     unk15: bpy.props.BoolProperty(
-        name="Both Interior And Exterior",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk15", update=FlagPropertyGroup.update_flag)
     lightoff: bpy.props.BoolProperty(
-        name="Corona Only",
-        description="Only the corona will be rendered",
-        update=FlagPropertyGroup.update_flag)
+        name="LightOff", update=FlagPropertyGroup.update_flag)
     prxoff: bpy.props.BoolProperty(
-        name="Not In Reflection",
-        description="The light won't be visible in reflections, such as mirrors",
-        update=FlagPropertyGroup.update_flag)
+        name="PrxOff", update=FlagPropertyGroup.update_flag)
     unk18: bpy.props.BoolProperty(
-        name="Only In Reflection",
-        description="The light will only be visible in reflections, such as mirrors",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk18", update=FlagPropertyGroup.update_flag)
     culling: bpy.props.BoolProperty(
-        name="Enable Culling Plane",
-        description="Enable the culling plane to cut out the light from the scene.\nMake sure to setup the culling plane settings accordingly",
-        update=FlagPropertyGroup.update_flag)
+        name="Culling", update=FlagPropertyGroup.update_flag)
     unk20: bpy.props.BoolProperty(
-        name="Enable Volume Outer Color",
-        description="Let you control the outer volume color. Otherwise, main color will be used",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk20", update=FlagPropertyGroup.update_flag)
     unk21: bpy.props.BoolProperty(
-        name="Unk21",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk21", update=FlagPropertyGroup.update_flag)
     unk22: bpy.props.BoolProperty(
-        name="Unk22",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk22", update=FlagPropertyGroup.update_flag)
     unk23: bpy.props.BoolProperty(
-        name="Unk23",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk23", update=FlagPropertyGroup.update_flag)
     glassoff: bpy.props.BoolProperty(
-        name="Don't Light Alpha",
-        description="Light won't affect transparent surfaces, such as glass",
-        update=FlagPropertyGroup.update_flag)
+        name="GlassOff", update=FlagPropertyGroup.update_flag)
     unk25: bpy.props.BoolProperty(
-        name="Unk25",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk25", update=FlagPropertyGroup.update_flag)
     unk26: bpy.props.BoolProperty(
-        name="Unk26",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk26", update=FlagPropertyGroup.update_flag)
     unk27: bpy.props.BoolProperty(
-        name="Unk27",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk27", update=FlagPropertyGroup.update_flag)
     unk28: bpy.props.BoolProperty(
-        name="Unk28",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk28", update=FlagPropertyGroup.update_flag)
     unk29: bpy.props.BoolProperty(
-        name="Unk29",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk29", update=FlagPropertyGroup.update_flag)
     unk30: bpy.props.BoolProperty(
-        name="Unk30",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk30", update=FlagPropertyGroup.update_flag)
     unk31: bpy.props.BoolProperty(
-        name="Volume only",
-        description="Only volumetric will be rendered if the according flag is set.\nCould also be used to disable the light",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk31", update=FlagPropertyGroup.update_flag)
     unk32: bpy.props.BoolProperty(
-        name="Unk32",
-        description="No description",
-        update=FlagPropertyGroup.update_flag)
+        name="Unk32", update=FlagPropertyGroup.update_flag)
 
 
 # Handler sets the default value of the ShaderMaterials collection on blend file load

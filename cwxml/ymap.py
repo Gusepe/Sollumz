@@ -1,3 +1,5 @@
+from mathutils import *
+
 from abc import ABC as AbstractClass, abstractmethod
 from typing import Union, Type
 from xml.etree import ElementTree as ET
@@ -7,9 +9,9 @@ from .element import (
     ElementTree,
     ListProperty,
     QuaternionProperty,
-    StringValueProperty,
     TextProperty,
     TextListProperty,
+    IntListProperty,
     ValueProperty,
     VectorProperty,
     TextPropertyRequired,
@@ -18,6 +20,7 @@ from .element import (
     Vector4Property,
 )
 
+from mathutils import Vector
 
 class YMAP:
 
@@ -40,7 +43,7 @@ class HexColorProperty(ElementProperty):
 
     def hex_to_rgb(hex: str) -> tuple:
         hex = hex.replace("0x", "")
-        return tuple(int(hex[i:i + 2], 16) / 255 for i in (0, 2, 4, 6))
+        return tuple(int(hex[i:i+2], 16) / 255 for i in (0, 2, 4, 6))
 
     def rgb_to_hex(rgb: tuple) -> str:
         return ('{:02X}{:02X}{:02X}{:02X}').format(*[int(x * 255) for x in rgb])
@@ -165,7 +168,7 @@ class ExtensionAudioEmitter(Extension):
     def __init__(self):
         super().__init__()
         self.offset_rotation = QuaternionProperty("offsetRotation")
-        self.effect_hash = StringValueProperty("effectHash")
+        self.effect_hash = ValueProperty("effectHash")
 
 
 class ExtensionExplosionEffect(Extension):
@@ -532,6 +535,95 @@ class PhysicsDictionariesList(ListProperty):
 
 # TODO: InstancedData
 
+class GrassInstance(ElementTree):
+    tag_name = "Item"
+    def __init__(self):
+        super().__init__()
+        self.BatchAABB = BatchAABB()
+        self.ScaleRange = VectorProperty("ScaleRange")
+        self.archetypeName = TextProperty("archetypeName")
+        self.lodDist = ValueProperty("lodDist")
+        self.LodFadeStartDist = ValueProperty("LodFadeStartDist")
+        self.LodInstFadeRange = ValueProperty("LodInstFadeRange")
+        self.OrientToTerrain = ValueProperty("OrientToTerrain")
+        self.InstanceList = GrassInstanceDataList()
+
+class BatchAABB(ElementTree):
+    tag_name = "BatchAABB"
+    def __init__(self):
+        super().__init__()
+        self.min:Vector4Property = Vector4Property("min")
+        self.max:Vector4Property = Vector4Property("max")
+    def get_size(self):
+        diff = (self.max - self.min)
+        return Vector([abs(diff.x), abs(diff.y), abs(diff.z)])
+    def get_center(self):
+        return Vector([self.min.x, self.min.y, self.min.z]) + self.get_size() * 0.5
+
+class GrassInstanceItem(ElementTree):
+    
+    tag_name = "Item"
+    
+    BATCH_VERT_MULTIPLIER = 0.00001525878
+    
+    def get_world_pos(self, batch_aabb: BatchAABB):
+        return Vector([batch_aabb.min.x, batch_aabb.min.y, batch_aabb.min.z]) + batch_aabb.get_size() * (Vector(self.Position) * self.BATCH_VERT_MULTIPLIER)
+    
+    def get_local_pos(self, parent_position:Vector, position:Vector, batch_aabb: BatchAABB):
+        
+        size = batch_aabb.get_size()
+        offset = (parent_position + position) - Vector([batch_aabb.min.x, batch_aabb.min.y, batch_aabb.min.z])
+        
+        ratio_x = size.x == 0 and 1 or offset.x / size.x
+        ratio_y = size.y == 0 and 1 or offset.y / size.y
+        ratio_z = size.z == 0 and 1 or offset.z / size.z
+        ratio   = Vector((ratio_x, ratio_y, ratio_z))
+        
+        return [int(x) for x in ratio / self.BATCH_VERT_MULTIPLIER]
+        
+    def __init__(self):
+        super().__init__()
+        self.Position = IntListProperty("Position")
+        self.NormalX = ValueProperty("NormalX")
+        self.NormalY = ValueProperty("NormalY")
+        self.Color = IntListProperty("Color")
+        self.Scale = ValueProperty("Scale")
+        self.Ao = ValueProperty("Ao")
+        self.Pad = IntListProperty("Pad")
+        
+        
+class GrassInstanceDataList(ListPropertyRequired):
+    list_type = GrassInstanceItem
+    tag_name = "InstanceList"
+    
+    def __init__(self, tag_name=None, value=None):
+        super().__init__(tag_name, value)
+        self.item_type = AttributeProperty("itemType", "rage__fwGrassInstanceListDef__InstanceData")
+
+class PropInstanceList(ListPropertyRequired):
+    list_type = GrassInstance
+    tag_name = "PropInstanceList"
+    
+    def __init__(self, tag_name=None, value=None):
+        super().__init__(tag_name, value)
+        self.item_type = AttributeProperty("itemType", "rage__fwPropInstanceListDef")
+    
+class GrassInstanceList(ListPropertyRequired):
+    list_type = GrassInstance
+    tag_name = "GrassInstanceList"
+    
+    def __init__(self, tag_name=None, value=None):
+        super().__init__(tag_name, value)
+        self.item_type = AttributeProperty("itemType", "rage__fwGrassInstanceListDef")
+        
+class InstancedDataProperty(ElementTree):
+    
+    tag_name = "instancedData"
+    def __init__(self):
+        super().__init__()
+        self.ImapLink = TextProperty("ImapLink")
+        self.PropInstanceList = PropInstanceList()
+        self.GrassInstanceList = GrassInstanceList()
 
 class TimeCycleModifier(ElementTree):
     tag_name = "Item"
@@ -621,7 +713,7 @@ class CMapData(ElementTree, AbstractClass):
         self.box_occluders = BoxOccludersList()
         self.occlude_models = OccludeModelsList()
         self.physics_dictionaries = PhysicsDictionariesList()
-        # self.instanced_data = InstancedDataProperty()
+        self.instanced_data = InstancedDataProperty()
         self.time_cycle_modifiers = TimeCycleModifiersList()
         self.car_generators = CarGeneratorsList()
         # self.lod_lights = LODLightsSOAProperty()

@@ -1,11 +1,9 @@
 import bpy
-from typing import Optional
 from mathutils import Vector
 from ...sollumz_operators import SOLLUMZ_OT_base, SearchEnumHelper
 from ...tools.blenderhelper import remove_number_suffix
-from ..utils import get_selected_archetype, get_selected_entity
-from ..properties.mlo import MloEntityProperties, get_portal_items_for_selected_archetype, get_room_items_for_selected_archetype
-from ..properties.ytyp import ArchetypeProperties
+from ..utils import get_selected_archetype, get_selected_room, get_selected_entity
+from ..properties.mlo import MloEntityProperties, get_portal_items, get_room_items, get_entityset_items
 
 
 def set_entity_properties_from_filter(entity: MloEntityProperties, context: bpy.types.Context):
@@ -52,14 +50,6 @@ class SOLLUMZ_OT_add_obj_as_entity(bpy.types.Operator):
         selected_archetype = get_selected_archetype(context)
 
         for obj in context.selected_objects:
-            existing_entity = self.get_entity_using_obj(
-                obj, selected_archetype)
-
-            if existing_entity is not None:
-                self.report(
-                    {"INFO"}, f"Object '{obj.name}' already linked to entity '{existing_entity.archetype_name}'! Skipping...")
-                continue
-
             entity = selected_archetype.new_entity()
             entity.archetype_name = remove_number_suffix(obj.name)
 
@@ -67,13 +57,6 @@ class SOLLUMZ_OT_add_obj_as_entity(bpy.types.Operator):
             set_entity_properties_from_filter(entity, context)
 
         return {"FINISHED"}
-
-    def get_entity_using_obj(self, obj: bpy.types.Object, archetype: ArchetypeProperties) -> Optional[MloEntityProperties]:
-        for entity in archetype.entities:
-            if entity.linked_object == obj:
-                return entity
-
-        return None
 
 
 class SOLLUMZ_OT_set_obj_entity_transforms(bpy.types.Operator):
@@ -132,7 +115,8 @@ class SOLLUMZ_OT_search_entity_portals(SearchEnumHelper, bpy.types.Operator):
     bl_idname = "sollumz.search_entity_portals"
     bl_property = "attached_portal_id"
 
-    attached_portal_id: bpy.props.EnumProperty(items=get_portal_items_for_selected_archetype, default=-1)
+    attached_portal_id: bpy.props.EnumProperty(
+        items=get_portal_items, default=-1)
 
     @classmethod
     def poll(cls, context):
@@ -147,7 +131,7 @@ class SOLLUMZ_OT_search_entity_rooms(SearchEnumHelper, bpy.types.Operator):
     bl_idname = "sollumz.search_entity_rooms"
     bl_property = "attached_room_id"
 
-    attached_room_id: bpy.props.EnumProperty(items=get_room_items_for_selected_archetype, default=-1)
+    attached_room_id: bpy.props.EnumProperty(items=get_room_items, default=-1)
 
     @classmethod
     def poll(cls, context):

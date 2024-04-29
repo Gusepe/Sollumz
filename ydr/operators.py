@@ -45,7 +45,8 @@ class SOLLUMZ_OT_create_drawable(SOLLUMZ_OT_base, bpy.types.Operator):
                             if child.type == "MESH":
                                 child.location -= dobjs[index].location
 
-            self.message(f"Succesfully converted {', '.join([obj.name for obj in context.selected_objects])} to a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]}.")
+            self.message(
+                f"Succesfully converted {', '.join([obj.name for obj in context.selected_objects])} to a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]}.")
             return True
         else:
             obj = create_drawable(drawable_type)
@@ -101,7 +102,8 @@ class MaterialConverterHelper:
                 if new_material is None:
                     continue
 
-                self.report({"INFO"}, f"Successfuly converted material '{new_material.name}'.")
+                self.report(
+                    {"INFO"}, f"Successfuly converted material '{new_material.name}'.")
 
         return {"FINISHED"}
 
@@ -176,10 +178,10 @@ class SOLLUMZ_OT_create_shader_material(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Embed all textures in active materials from selected objects"""
+    """Sets all textures to embedded on the selected objects active material"""
     bl_idname = "sollumz.setallembedded"
-    bl_label = "Embed active"
-    bl_action = "Embed active"
+    bl_label = "Set all Textures Embedded"
+    bl_action = "Set all Textures Embedded"
 
     def set_textures_embedded(self, obj):
         mat = obj.active_material
@@ -191,14 +193,17 @@ class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
             for node in mat.node_tree.nodes:
                 if isinstance(node, bpy.types.ShaderNodeTexImage):
                     node.texture_properties.embedded = True
-            self.message(f"Set {obj.name} material {mat.name} textures to embedded.")
+            self.message(
+                f"Set {obj.name}s material {mat.name} textures to embedded.")
         else:
-            self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+            self.message(
+                f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if len(objs) == 0:
-            self.warning(f"Please select a object to set all textures embedded.")
+            self.warning(
+                f"Please select a object to set all textures embedded.")
             return False
 
         for obj in objs:
@@ -208,10 +213,10 @@ class SOLLUMZ_OT_set_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
 
 
 class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Embed all textures in all materials from selected objects"""
+    """Sets all materials to embedded"""
     bl_idname = "sollumz.setallmatembedded"
-    bl_label = "Embed all"
-    bl_action = "Embed all"
+    bl_label = "Set all Materials Embedded"
+    bl_action = "Set All Materials Embedded"
 
     def set_materials_embedded(self, obj):
         for mat in obj.data.materials:
@@ -219,14 +224,17 @@ class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator)
                 for node in mat.node_tree.nodes:
                     if isinstance(node, bpy.types.ShaderNodeTexImage):
                         node.texture_properties.embedded = True
-                self.message(f"Set {obj.name} materials {mat.name} textures to embedded.")
+                self.message(
+                    f"Set {obj.name}s material {mat.name} textures to embedded.")
             else:
-                self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+                self.message(
+                    f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if len(objs) == 0:
-            self.warning(f"Please select a object to set all textures embedded.")
+            self.warning(
+                f"Please select a object to set all textures embedded.")
             return False
 
         for obj in objs:
@@ -236,10 +244,10 @@ class SOLLUMZ_OT_set_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator)
 
 
 class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Unembed all textures in active material from selected objects"""
+    """Remove all embeded textures on the selected objects active material"""
     bl_idname = "sollumz.removeallembedded"
-    bl_label = "Unembed active"
-    bl_action = "Unembed active"
+    bl_label = "Remove all Embeded Textures"
+    bl_action = "Remove all Embeded Textures"
 
     def set_textures_unembedded(self, obj):
         mat = obj.active_material
@@ -251,14 +259,17 @@ class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operato
             for node in mat.node_tree.nodes:
                 if (isinstance(node, bpy.types.ShaderNodeTexImage)):
                     node.texture_properties.embedded = False
-            self.message(f"Set {obj.name}s material {mat.name} textures to unembedded.")
+            self.message(
+                f"Set {obj.name}s material {mat.name} textures to unembedded.")
         else:
-            self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+            self.message(
+                f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if (len(objs) == 0):
-            self.warning(f"Please select a object to remove all embeded textures.")
+            self.warning(
+                f"Please select a object to remove all embeded textures.")
             return False
 
         for obj in objs:
@@ -266,11 +277,12 @@ class SOLLUMZ_OT_remove_all_textures_embedded(SOLLUMZ_OT_base, bpy.types.Operato
 
         return True
 
+
 class SOLLUMZ_OT_unset_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Unembed all textures in all materials from selected objects"""
+    """Make all materials on the selected object use non-embedded textures"""
     bl_idname = "sollumz.removeallmatembedded"
-    bl_label = "Unembed all"
-    bl_action = "Unembed all"
+    bl_label = "Set all Materials Unembedded"
+    bl_action = "Set all Materials Unembedded"
 
     def set_materials_unembedded(self, obj):
         for mat in obj.data.materials:
@@ -278,14 +290,17 @@ class SOLLUMZ_OT_unset_all_materials_embedded(SOLLUMZ_OT_base, bpy.types.Operato
                 for node in mat.node_tree.nodes:
                     if (isinstance(node, bpy.types.ShaderNodeTexImage)):
                         node.texture_properties.embedded = False
-                self.message(f"Set {obj.name}s materials to unembedded.")
+                self.message(
+                    f"Set {obj.name}s materials to unembedded.")
             else:
-                self.message(f"Skipping object {obj.name} because it does not have a sollumz shader active.")
+                self.message(
+                    f"Skipping object {obj.name} because it does not have a sollumz shader active.")
 
     def run(self, context):
         objs = bpy.context.selected_objects
         if (len(objs) == 0):
-            self.warning(f"Please select a object to remove all embedded materials.")
+            self.warning(
+                f"Please select a object to remove all embedded materials.")
             return False
 
         for obj in objs:
@@ -391,79 +406,41 @@ class SOLLUMZ_OT_apply_bone_properties_to_selected_bones(SOLLUMZ_OT_base, bpy.ty
         self.message(f"Apply bone properties to {count} bone(s)")
         return True
 
-class SOLLUMZ_OT_clear_bone_flags(bpy.types.Operator):
-    bl_idname = "sollumz.removeboneflags"
-    bl_label = "Remove Bone Flags"
-    bl_description = "Remove all bone flags for selected bones"
+class SOLLUMZ_OT_animation_flags(bpy.types.Operator):
+    bl_idname = "sollumz.animationflags"
+    bl_label = "Animation Flags"
+    bl_description = "Adds the proper flags for animation bones"
 
     def execute(self, context):
         bone = context.active_pose_bone.bone
         bone.bone_properties.flags.clear()  # Remove all the flags
-        self.report({'INFO'}, "Flags Removed")
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "RotX"  
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "RotY" 
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "RotZ" 
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "TransX" 
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "TransY" 
+        new_flag = bone.bone_properties.flags.add()
+        new_flag.name = "TransZ"       
+        self.report({'INFO'}, "Flags Added") 
         return {'FINISHED'}
-
-
-class SOLLUMZ_OT_rotation_bone_flags(bpy.types.Operator):
-    bl_idname = "sollumz.rotationboneflags"
-    bl_label = "Add Rotation Flags"
-    bl_description = "Add rotation flags for selected bones"
+    
+   
+class SOLLUMZ_OT_weapon_flags(bpy.types.Operator):
+    bl_idname = "sollumz.weaponflags"
+    bl_label = "Weapon Flags"
+    bl_description = "Removes selected bone flags and adds the proper weapon flags for custom bone locations"
 
     def execute(self, context):
         bone = context.active_pose_bone.bone
+        bone.bone_properties.flags.clear()  # Remove all the flags
         new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "RotX"
+        new_flag.name = "LimitRotation"  
         new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "RotY"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "RotZ"
-        self.report({'INFO'}, "Rotation Flags Added")
-        return {'FINISHED'}
-
-
-class SOLLUMZ_OT_transform_bone_flags(bpy.types.Operator):
-    bl_idname = "sollumz.transformboneflags"
-    bl_label = "Add Transform Flags"
-    bl_description = "Add transform flags for selected bones"
-
-    def execute(self, context):
-        bone = context.active_pose_bone.bone
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "TransX"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "TransY"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "TransZ"
-        self.report({'INFO'}, "Transform Flags Added")
-        return {'FINISHED'}
-
-
-class SOLLUMZ_OT_scale_bone_flags(bpy.types.Operator):
-    bl_idname = "sollumz.scaleboneflags"
-    bl_label = "Add Scale Flags"
-    bl_description = "Add scale flags for selected bones"
-
-    def execute(self, context):
-        bone = context.active_pose_bone.bone
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "ScaleX"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "ScaleY"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "ScaleZ"
-        self.report({'INFO'}, "Scale Flags Added")
-        return {'FINISHED'}
-
-
-class SOLLUMZ_OT_limit_bone_flags(bpy.types.Operator):
-    bl_idname = "sollumz.limitboneflags"
-    bl_label = "Add Limit Flags"
-    bl_description = "Removes selected bone flags and adds the proper limit flags for custom bone locations"
-
-    def execute(self, context):
-        bone = context.active_pose_bone.bone
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "LimitRotation"
-        new_flag = bone.bone_properties.flags.add()
-        new_flag.name = "LimitTranslation"
-        self.report({'INFO'}, "Limit Flags Added")
+        new_flag.name = "LimitTranslation"  
+        self.report({'INFO'}, "Flags Cleared & Added") 
         return {'FINISHED'}

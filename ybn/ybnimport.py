@@ -192,6 +192,7 @@ def verts_to_obj(vertices, polys, materials, parent, vertex_colors=None):
 
     # apply vertex colors
     if len(vertex_colors) != 0:
+        print(vertex_colors[0])
         create_vertexcolor_layer(obj.data, 0, "Color Layer", vertex_colors)
 
     # apply materials

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TextureDictionary>
+ <Item>
+  <Name>nxg_sl_desert_grass_001_dm</Name>
+  <Unk32 value="32" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X16, X64, Y64, X256, Y512, Y1024, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="1024" />
+  <Height value="1024" />
+  <MipLevels value="11" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>nxg_sl_desert_grass_001_dm.dds</FileName>
+ </Item>
+ <Item>
+  <Name>nxg_sl_small_bushy_1_dm</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, Y512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>nxg_sl_small_bushy_1_dm.dds</FileName>
+ </Item>
+ <Item>
+  <Name>nxg_sl_widebranch_d</Name>
+  <Unk32 value="32" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X16, X64, Y64, X256, Y512, Y1024, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="1024" />
+  <Height value="1024" />
+  <MipLevels value="11" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>nxg_sl_widebranch_d.dds</FileName>
+ </Item>
+</TextureDictionary>

@@ -6,7 +6,5 @@ def register():
         type=bpy.props.StringProperty)
 
 
-
-
 def unregister():
     del bpy.types.Object.poly_flags

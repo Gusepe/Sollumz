@@ -32,12 +32,8 @@ class SOLLUMZ_MT_pie_menu(Menu):
         pie.operator("sollumz.import",
                      text="Import CodeWalker XML", icon='IMPORT')
         # Top-right
-        if context.scene.sollumz_export_path != "":
-            op = pie.operator("sollumz.export", text="Export CodeWalker XML", icon='EXPORT')
-            op.directory = context.scene.sollumz_export_path
-            op.direct_export = True
-        else:
-            pie.operator("sollumz.export", text="Export CodeWalker XML", icon='EXPORT')
+        pie.operator("sollumz.export",
+                     text="Export CodeWalker XML", icon='EXPORT')
         # Bottom-left
         pie.operator("sollumz.createdrawable",
                      text="Create Drawable", icon='CUBE')

@@ -1,9 +1,7 @@
 import bpy
-from .sollumz_operators import SOLLUMZ_OT_copy_all_locations, SOLLUMZ_OT_copy_location, SOLLUMZ_OT_copy_rotation, SOLLUMZ_OT_paste_location
 from .tools.blenderhelper import get_armature_obj, get_addon_preferences
 from .sollumz_properties import SollumType, MaterialType
 from typing import Tuple, Callable
-from .icons import icon_manager
 
 
 def draw_list_with_add_remove(layout: bpy.types.UILayout, add_operator: str, remove_operator: str, *temp_list_args, **temp_list_kwargs):
@@ -11,12 +9,11 @@ def draw_list_with_add_remove(layout: bpy.types.UILayout, add_operator: str, rem
     row = layout.row()
     list_col = row.column()
     list_col.template_list(*temp_list_args, **temp_list_kwargs)
-    side_col = row.column()
-    col = side_col.column(align=True)
+    col = row.column(align=True)
     col.operator(add_operator, text="", icon="ADD")
     col.operator(remove_operator, text="", icon="REMOVE")
 
-    return list_col, side_col
+    return list_col
 
 
 class BasicListHelper:
@@ -100,7 +97,6 @@ class SOLLUMZ_PT_import_main(bpy.types.Panel):
 
         layout.prop(operator.import_settings, "batch_mode")
         layout.prop(operator.import_settings, "import_as_asset")
-        layout.prop(operator.import_settings, "ignore_embedded_col")
 
 
 class SOLLUMZ_PT_import_geometry(bpy.types.Panel):
@@ -249,11 +245,10 @@ class SOLLUMZ_PT_import_ymap(bpy.types.Panel):
 
         layout.prop(operator.import_settings, "ymap_skip_missing_entities")
         layout.prop(operator.import_settings, "ymap_exclude_entities")
-        layout.prop(operator.import_settings, "ymap_instance_entities")
         layout.prop(operator.import_settings, "ymap_box_occluders")
         layout.prop(operator.import_settings, "ymap_model_occluders")
         layout.prop(operator.import_settings, "ymap_car_generators")
-
+        layout.prop(operator.import_settings, "ymap_instanced_data")
 
 class SOLLUMZ_PT_export_main(bpy.types.Panel):
     bl_space_type = "FILE_BROWSER"
@@ -391,6 +386,7 @@ class SOLLUMZ_PT_export_ymap(bpy.types.Panel):
         layout.prop(operator.export_settings, "ymap_box_occluders")
         layout.prop(operator.export_settings, "ymap_model_occluders")
         layout.prop(operator.export_settings, "ymap_car_generators")
+        layout.prop(operator.export_settings, "ymap_instanced_data")
 
 
 class SOLLUMZ_PT_export_drawable(bpy.types.Panel):
@@ -433,13 +429,7 @@ class SOLLUMZ_PT_TOOL_PANEL(bpy.types.Panel):
         layout = self.layout
         row = layout.row()
         row.operator("sollumz.import")
-
-        if context.scene.sollumz_export_path != "":
-            op = row.operator("sollumz.export")
-            op.directory = context.scene.sollumz_export_path
-            op.direct_export = True
-        else:
-            row.operator("sollumz.export")
+        row.operator("sollumz.export")
 
 
 class SOLLUMZ_PT_VIEW_PANEL(bpy.types.Panel):
@@ -474,7 +464,7 @@ class SOLLUMZ_PT_VIEW_PANEL(bpy.types.Panel):
 
 
 class SOLLUMZ_PT_OBJ_YMAP_LOCATION(bpy.types.Panel):
-    bl_label = "Object Location & Rotation Tools"
+    bl_label = "Copy Objects Location to Clipboard"
     bl_idname = "SOLLUMZ_PT_OBJ_YMAP_LOCATION"
     bl_category = "Sollumz Tools"
     bl_space_type = "VIEW_3D"
@@ -500,28 +490,72 @@ class SOLLUMZ_PT_OBJ_YMAP_LOCATION(bpy.types.Panel):
 
                 # Add a Clipboard button to copy the location to the clipboard
                 clip_button = row.operator(
-                    SOLLUMZ_OT_copy_location.bl_idname, text="", icon='COPYDOWN')
+                    "wm.sollumz_copy_location", text="", icon='COPYDOWN')
                 clip_button.location = "{:.6f}, {:.6f}, {:.6f}".format(
                     loc[0], loc[1], loc[2])
 
-                # Convert the object's rotation to a quaternion and copy it to the clipboard
-                rot = obj.matrix_world.to_quaternion()
-                rot_button = row.operator(
-                    SOLLUMZ_OT_copy_rotation.bl_idname, text="", icon='COPYDOWN')
-                rot_button.rotation = "{:.6f}, {:.6f}, {:.6f}, {:.6f}".format(
-                    rot.x, rot.y, rot.z, rot.w)
-                paste_button = row.operator(SOLLUMZ_OT_paste_location.bl_idname,
-                                            text="", icon='PASTEDOWN')
-                paste_button.location = "{:.6f}, {:.6f}, {:.6f}".format(
-                    loc[0], loc[1], loc[2])
+            # Convert the object's rotation to a quaternion and copy it to the clipboard
+            rot = obj.matrix_world.to_quaternion()
+            rot_xyzw = [rot.x, rot.y, rot.z, rot.w]
+            rot_button = row.operator(
+                "wm.sollumz_copy_rotation", text="", icon='COPYDOWN')
+            rot_button.rotation = "{:.6f}, {:.6f}, {:.6f}, {:.6f}".format(
+                rot.x, rot.y, rot.z, rot.w)
 
             # Add a button to copy all selected objects' locations to the clipboard
             if len(selected_objects) > 1:
                 row = layout.row()
-                row.operator(SOLLUMZ_OT_copy_all_locations.bl_idname,
+                row.operator("wm.sollumz_copy_all_locations",
                              text="Copy All Locations", icon='COPY_ID')
         else:
             layout.label(text="No objects selected")
+
+
+class SOLLUMZ_OT_copy_location(bpy.types.Operator):
+    """Copy the location of an object to the clipboard"""
+    bl_idname = "wm.sollumz_copy_location"
+    bl_label = ""
+    location: bpy.props.StringProperty()
+
+    def execute(self, context):
+        bpy.context.window_manager.clipboard = self.location
+        self.report(
+            {'INFO'}, "Location XDd copied to clipboard: {}".format(self.location))
+        return {'FINISHED'}
+
+
+class SOLLUMZ_OT_copy_rotation(bpy.types.Operator):
+    """Copy the quaternion rotation of an object to the clipboard"""
+    bl_idname = "wm.sollumz_copy_rotation"
+    bl_label = ""
+    rotation: bpy.props.StringProperty()
+
+    def execute(self, context):
+        # Remove the brackets from the rotation string
+        rotation = self.rotation.strip('[]')
+        bpy.context.window_manager.clipboard = rotation
+        self.report(
+            {'INFO'}, "Rotation copied to clipboard: {}".format(rotation))
+        return {'FINISHED'}
+
+
+class SOLLUMZ_OT_copy_all_locations(bpy.types.Operator):
+    """Copy the locations of all selected objects to the clipboard"""
+    bl_idname = "wm.sollumz_copy_all_locations"
+    bl_label = ""
+    locations: bpy.props.StringProperty()
+
+    def execute(self, context):
+        selected_objects = bpy.context.selected_objects
+        locations_text = ""
+        for obj in selected_objects:
+            loc = obj.location
+            locations_text += "{}: {:.6f}, {:.6f}, {:.6f}\n".format(
+                obj.name, loc[0], loc[1], loc[2])
+        bpy.context.window_manager.clipboard = locations_text
+        self.report(
+            {'INFO'}, "Locations copied to clipboard:\n{}".format(locations_text))
+        return {'FINISHED'}
 
 
 class SOLLUMZ_PT_VERTEX_TOOL_PANEL(bpy.types.Panel):
@@ -608,23 +642,6 @@ class SOLLUMZ_PT_DEBUG_PANEL(bpy.types.Panel):
         row.operator("sollumz.debug_reload_entity_sets")
 
 
-class SOLLUMZ_PT_EXPORT_PATH_PANEL(bpy.types.Panel):
-    bl_label = "Export path"
-    bl_idname = "SOLLUMZ_PT_EXPORT_PATH_PANEL"
-    bl_category = "Sollumz Tools"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {"DEFAULT_CLOSED"}
-    bl_parent_id = SOLLUMZ_PT_TOOL_PANEL.bl_idname
-    bl_order = 5
-
-    def draw_header(self, context):
-        self.layout.label(text="", icon="FILEBROWSER")
-
-    def draw(self, context):
-        self.layout.prop(context.scene, "sollumz_export_path", text="")
-
-
 class SOLLUMZ_PT_TERRAIN_PAINTER_PANEL(bpy.types.Panel):
     bl_label = "Terrain Painter"
     bl_idname = "SOLLUMZ_PT_TERRAIN_PAINTER_PANEL"
@@ -657,16 +674,18 @@ class SOLLUMZ_PT_OBJECT_PANEL(bpy.types.Panel):
     bl_context = "object"
     bl_options = {"DEFAULT_CLOSED"}
 
-    def draw_header(self, context):
-        icon_manager.icon_label("sollumz_icon", self)
-
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
 
         obj = context.active_object
         row = layout.row()
-        row.prop(obj, "sollum_type", text="")
+        row.enabled = False
+        row.prop(obj, "sollum_type")
+
+        if not obj or obj.sollum_type == SollumType.NONE:
+            layout.label(
+                text="No sollumz objects in scene selected.", icon="ERROR")
 
 
 class SOLLUMZ_PT_ENTITY_PANEL(bpy.types.Panel):
@@ -709,9 +728,6 @@ class SOLLUMZ_PT_MAT_PANEL(bpy.types.Panel):
     bl_context = "material"
     bl_options = {"DEFAULT_CLOSED"}
 
-    def draw_header(self, context):
-        icon_manager.icon_label("sollumz_icon", self)
-
     def draw(self, context):
         layout = self.layout
 
@@ -737,11 +753,11 @@ class FlagsPanel:
         data_block = self.get_flags(context)
         self.layout.prop(data_block, "total")
         self.layout.separator()
-        grid = self.layout.grid_flow(columns=2, align=True)
+        grid = self.layout.grid_flow(columns=2)
         for index, prop_name in enumerate(data_block.__annotations__):
             if index > data_block.size - 1:
                 break
-            grid.prop(data_block, prop_name, toggle=True)
+            grid.prop(data_block, prop_name)
 
 
 class TimeFlagsPanel(FlagsPanel):

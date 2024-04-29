@@ -1,8 +1,8 @@
 import bpy
+from ..tools.version import USE_LEGACY
 from ..cwxml.shader import ShaderManager
 from ..sollumz_properties import MaterialType
 from collections import namedtuple
-from .render_bucket import RenderBucket
 
 ShaderMaterial = namedtuple("ShaderMaterial", "name, ui_name, value")
 
@@ -34,31 +34,6 @@ def get_child_nodes(node):
     return child_nodes
 
 
-def group_image_texture_nodes(node_tree):
-    image_texture_nodes = [node for node in node_tree.nodes if node.type == "TEX_IMAGE"]
-
-    if not image_texture_nodes:
-        return
-
-    image_texture_nodes.sort(key=lambda node: node.location.y)
-
-    avg_x = min([node.location.x for node in image_texture_nodes])
-
-    # adjust margin to change gap in between img nodes
-    margin = 275
-    current_y = min([node.location.y for node in image_texture_nodes]) - margin
-    for node in image_texture_nodes:
-        current_y += margin
-        node.location.x = avg_x
-        node.location.y = current_y
-
-    # how far to the left the img nodes are
-    group_offset = 400
-    for node in image_texture_nodes:
-        node.location.x -= group_offset
-        node.location.y += group_offset
-
-
 def get_loose_nodes(node_tree):
     loose_nodes = []
     for node in node_tree.nodes:
@@ -85,7 +60,6 @@ def organize_node_tree(node_tree):
     mo.location.y = 0
     organize_node(mo)
     organize_loose_nodes(node_tree, 1000, 0)
-    group_image_texture_nodes(node_tree)
 
 
 def organize_node(node):
@@ -114,10 +88,10 @@ def organize_loose_nodes(node_tree, start_x, start_y):
             grid_x = start_x
             grid_y -= 150
 
-        node.location.x = grid_x + node.width / 2
-        node.location.y = grid_y - node.height / 2
+        node.location.x = grid_x
+        node.location.y = grid_y
 
-        grid_x += node.width + 25
+        grid_x -= node.width + 25
 
 
 def get_tinted_sampler(mat):  # move to blenderhelper.py?
@@ -266,7 +240,6 @@ def create_tinted_geometry_graph():  # move to blenderhelper.py?
 def create_image_node(node_tree, param):
     imgnode = node_tree.nodes.new("ShaderNodeTexImage")
     imgnode.name = param.name
-    imgnode.label = param.name
     imgnode.is_sollumz = True
     return imgnode
 
@@ -276,7 +249,6 @@ def create_vector_nodes(node_tree, param):
         if attr.name != "name" and attr.name != "type":
             node = node_tree.nodes.new("ShaderNodeValue")
             node.name = f"{param.name}_{attr.name}"
-            node.label = node.name
             node.is_sollumz = True
             node.outputs[0].default_value = float(attr.value)
 
@@ -299,9 +271,10 @@ def create_array_nodes(node_tree, param):
         array_item_group = bpy.data.node_groups["ArrayNode"]
 
     for i, value in enumerate(param.values):
+        nodename = f"{param.name} {i + 1}"
         node = node_tree.nodes.new("ShaderNodeGroup")
-        node.name = f"{param.name} {i + 1}"
-        node.label = node.name
+        node.name = nodename
+        node.label = nodename
         node.node_tree = array_item_group
 
         for index in range(0, len(node.inputs)):
@@ -331,7 +304,6 @@ def link_diffuses(node_tree, tex1, tex2):
 def link_detailed_normal(node_tree, bumptex, dtltex, spectex):
     dtltex2 = node_tree.nodes.new("ShaderNodeTexImage")
     dtltex2.name = "Extra"
-    dtltex2.label = dtltex2.name
     bsdf = node_tree.nodes["Principled BSDF"]
     dsz = node_tree.nodes["detailSettings_z"]
     dsw = node_tree.nodes["detailSettings_w"]
@@ -853,7 +825,7 @@ def create_shader(filename: str):
     mat.use_nodes = True
     mat.shader_properties.name = base_name
     mat.shader_properties.filename = filename
-    mat.shader_properties.renderbucket = RenderBucket(shader.render_buckets[0]).name
+    mat.shader_properties.renderbucket = shader.render_buckets[0]
 
     if filename in ShaderManager.terrains:
         create_terrain_shader(mat, shader, filename)

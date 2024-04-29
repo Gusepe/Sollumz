@@ -472,7 +472,7 @@ class ValueProperty(ElementProperty):
     @staticmethod
     def from_xml(element: ET.Element):
         if not "value" in element.attrib:
-            ElementProperty.read_value_error(element)
+            ValueProperty.read_value_error(element)
 
         return ValueProperty(element.tag, get_str_type(element.get("value")))
 
@@ -484,23 +484,6 @@ class ValueProperty(ElementProperty):
             value = int(self.value) if self.value.is_integer(
             ) else float32(self.value)
         return ET.Element(self.tag_name, attrib={"value": str(value)})
-
-
-class StringValueProperty(ElementProperty):
-    value_types = (str)
-
-    def __init__(self, tag_name: str, value=""):
-        super().__init__(tag_name, value)
-
-    @staticmethod
-    def from_xml(element: ET.Element):
-        if not "value" in element.attrib:
-            ElementProperty.read_value_error(element)
-
-        return StringValueProperty(element.tag, element.get("value"))
-
-    def to_xml(self):
-        return ET.Element(self.tag_name, attrib={"value": self.value})
 
 
 class TextListProperty(ElementProperty):
@@ -520,4 +503,23 @@ class TextListProperty(ElementProperty):
 
         elem = ET.Element(self.tag_name)
         elem.text = " ".join(self.value)
+        return elem
+    
+class IntListProperty(ElementProperty):
+    """Separates each word of an element's text into a list"""
+    value_types = (list)
+
+    def __init__(self, tag_name, value=None):
+        super().__init__(tag_name, value or [])
+
+    @staticmethod
+    def from_xml(element):
+        return IntListProperty(element.tag, value=[int(x) for x in element.text.split(" ")])
+
+    def to_xml(self):
+        if not self.value or len(self.value) < 1:
+            return None
+
+        elem = ET.Element(self.tag_name)
+        elem.text = " ".join([str(x) for x in self.value])
         return elem

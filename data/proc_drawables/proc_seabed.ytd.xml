@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TextureDictionary>
+ <Item>
+  <Name>cs_rsn_coralfan_001cs_rsn_coralfan_001_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>cs_rsn_coralfan_001cs_rsn_coralfan_001_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_sealife_03prop_sealife_03_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="64" />
+  <Height value="64" />
+  <MipLevels value="5" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>prop_sealife_03prop_sealife_03_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_seabedrock_01_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_seabedrock_01_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>nxg_sl_bluecoral_02</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>Y4, X16, X32, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="512" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>nxg_sl_bluecoral_02.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_03</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_03.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_sealife_05</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>prop_sealife_05.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsl_pk_coralc_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsl_pk_coralc_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_04</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_04.dds</FileName>
+ </Item>
+ <Item>
+  <Name>pas_coral_003_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>pas_coral_003_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_starfish_01</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>prop_starfish_01.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_02_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_02_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_coral_sweed_04_sl_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>prop_coral_sweed_04_sl_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>nxg_sl_yellowcoral_01</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>Y4, X16, X32, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="512" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>nxg_sl_yellowcoral_01.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_03_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_03_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_04_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_04_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>pas_coral_003</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>pas_coral_003.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsl_pk_coral7_bcs_rsl_pk_coral7_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>cs_rsl_pk_coral7_bcs_rsl_pk_coral7_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_coralfan_pucs_rsn_coralfan_pu_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>cs_rsn_coralfan_pucs_rsn_coralfan_pu_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>nxg_sl_yellowcoral_01_n</Name>
+  <Unk32 value="128" />
+  <Usage>NORMAL</Usage>
+  <UsageFlags>Y4, X16, X32, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="512" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>nxg_sl_yellowcoral_01_n.dds</FileName>
+ </Item>
+ <Item>
+  <Name>proc_sl_goldengorgonian_01proc_sl_goldengorgonian_01_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>proc_sl_goldengorgonian_01proc_sl_goldengorgonian_01_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_sealife_01prop_sealife_01_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="64" />
+  <Height value="64" />
+  <MipLevels value="5" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>prop_sealife_01prop_sealife_01_a.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_coral_sweed_04_sl</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, Y512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>prop_coral_sweed_04_sl.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsl_sl_pk_coralc_1</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, Y64, X256, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="256" />
+  <Height value="256" />
+  <MipLevels value="7" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>cs_rsl_sl_pk_coralc_1.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_uw_seavegrock_02</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_uw_seavegrock_02.dds</FileName>
+ </Item>
+ <Item>
+  <Name>cs_rsn_sl_seabedrock_01</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X32, X64, X128, X512, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="512" />
+  <Height value="512" />
+  <MipLevels value="8" />
+  <Format>D3DFMT_DXT1</Format>
+  <FileName>cs_rsn_sl_seabedrock_01.dds</FileName>
+ </Item>
+ <Item>
+  <Name>prop_sealife_02prop_sealife_02_a</Name>
+  <Unk32 value="128" />
+  <Usage>DIFFUSE</Usage>
+  <UsageFlags>X64, X128, UNK24</UsageFlags>
+  <ExtraFlags value="0" />
+  <Width value="64" />
+  <Height value="64" />
+  <MipLevels value="5" />
+  <Format>D3DFMT_DXT5</Format>
+  <FileName>prop_sealife_02prop_sealife_02_a.dds</FileName>
+ </Item>
+</TextureDictionary>

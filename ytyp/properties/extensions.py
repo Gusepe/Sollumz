@@ -16,25 +16,8 @@ class ExtensionType(str, Enum):
     SPAWN_POINT = "CExtensionDefSpawnPoint"
     SPAWN_POINT_OVERRIDE = "CExtensionDefSpawnPointOverride"
     WIND_DISTURBANCE = "CExtensionDefWindDisturbance"
-    PROC_OBJECT = "CExtensionDefProcObject"
+    PROC_OBJECT = "CExtensionProcObject"
     EXPRESSION = "CExtensionDefExpression"
-
-
-ExtensionTypeEnumItems = (
-    (ExtensionType.DOOR, "Door", "", 0),
-    (ExtensionType.PARTICLE, "Particle", "", 1),
-    (ExtensionType.AUDIO_COLLISION, "Audio Collision Settings", "", 2),
-    (ExtensionType.AUDIO_EMITTER, "Audio Emitter", "", 3),
-    (ExtensionType.EXPLOSION_EFFECT, "Explosion Effect", "", 4),
-    (ExtensionType.LADDER, "Ladder", "", 5),
-    (ExtensionType.BUOYANCY, "Buoyancy", "", 6),
-    (ExtensionType.LIGHT_SHAFT, "Light Shaft", "", 7),
-    (ExtensionType.SPAWN_POINT, "Spawn Point", "", 8),
-    (ExtensionType.SPAWN_POINT_OVERRIDE, "Spawn Point Override", "", 9),
-    (ExtensionType.WIND_DISTURBANCE, "Wind Disturbance", "", 10),
-    (ExtensionType.PROC_OBJECT, "Procedural Object", "", 11),
-    (ExtensionType.EXPRESSION, "Expression", "", 12),
-)
 
 
 class LightShaftDensityType(str, Enum):
@@ -48,27 +31,9 @@ class LightShaftDensityType(str, Enum):
     QUADRATIC_GRADIENT = "LIGHTSHAFT_DENSITYTYPE_QUADRATIC_GRADIENT"
 
 
-LightShaftDensityTypeEnumItems = (
-    (LightShaftDensityType.CONSTANT, "Constant", "", 0),
-    (LightShaftDensityType.SOFT, "Soft", "", 1),
-    (LightShaftDensityType.SOFT_SHADOW, "Soft Shadow", "", 2),
-    (LightShaftDensityType.SOFT_SHADOW_HD, "Soft Shadow HD", "", 3),
-    (LightShaftDensityType.LINEAR, "Linear", "", 4),
-    (LightShaftDensityType.LINEAR_GRADIENT, "Linear Gradient", "", 5),
-    (LightShaftDensityType.QUADRATIC, "Quadratic", "", 6),
-    (LightShaftDensityType.QUADRATIC_GRADIENT, "Quadratic Gradient", "", 7),
-)
-
-
 class LightShaftVolumeType(str, Enum):
     SHAFT = "LIGHTSHAFT_VOLUMETYPE_SHAFT"
     CYLINDER = "LIGHTSHAFT_VOLUMETYPE_CYLINDER"
-
-
-LightShaftVolumeTypeEnumItems = (
-    (LightShaftVolumeType.SHAFT, "Shaft", "", 0),
-    (LightShaftVolumeType.CYLINDER, "Cylinder", "", 1),
-)
 
 
 class BaseExtensionProperties:
@@ -148,9 +113,12 @@ class ExpressionExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProper
 
 
 class LightShaftExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProperties):
-    density_type: bpy.props.EnumProperty(items=LightShaftDensityTypeEnumItems, name="Density Type")
-    volume_type: bpy.props.EnumProperty(items=LightShaftVolumeTypeEnumItems, name="Volume Type")
-    scale_by_sun_intensity: bpy.props.BoolProperty(name="Scale by Sun Intensity")
+    density_type: bpy.props.EnumProperty(
+        items=[(item.value, item.value, "") for item in LightShaftDensityType], name="Density Type")
+    volume_type: bpy.props.EnumProperty(
+        items=[(item.value, item.value, "") for item in LightShaftVolumeType], name="Volume Type")
+    scale_by_sun_intensity: bpy.props.BoolProperty(
+        name="Scale by Sun Intensity")        
     direction_amount: bpy.props.FloatProperty(name="Direction Amount")
     length: bpy.props.FloatProperty(name="Length")
     color: bpy.props.FloatVectorProperty(
@@ -176,6 +144,7 @@ class LightShaftExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProper
         name="Corner D", subtype="TRANSLATION")
     direction: bpy.props.FloatVectorProperty(
         name="Direction", subtype="XYZ")
+
 
 
 class SpawnPointExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProperties):
@@ -267,7 +236,8 @@ class ExtensionProperties(bpy.types.PropertyGroup):
         elif self.extension_type == ExtensionType.WIND_DISTURBANCE:
             return self.wind_disturbance_properties
 
-    extension_type: bpy.props.EnumProperty(name="Type", items=ExtensionTypeEnumItems)
+    extension_type: bpy.props.EnumProperty(
+        items=[(item.value, item.value, "") for item in ExtensionType], name="Type")
     name: bpy.props.StringProperty(name="Name", default="Extension")
 
     door_extension_properties: bpy.props.PointerProperty(
@@ -299,60 +269,25 @@ class ExtensionProperties(bpy.types.PropertyGroup):
 
 
 class ExtensionsContainer:
-    def new_extension(self, ext_type=None) -> ExtensionProperties:
+    def new_extension(self, type=None):
         # Fallback type if no type is provided or invalid
-        if ext_type is None or ext_type not in ExtensionType._value2member_map_:
-            ext_type = ExtensionType.DOOR
+        if type is None or type not in ExtensionType._value2member_map_:
+            type = ExtensionType.DOOR
 
         item: ExtensionProperties = self.extensions.add()
-        item.extension_type = ext_type
-
-        # assign some sane defaults to light shaft and ladder so the gizmos are shown properly
-        light_shaft_props = item.light_shaft_extension_properties
-        s = 0.1  # half size
-        light_shaft_props.cornerA = -s, 0.0, s
-        light_shaft_props.cornerB = s, 0.0, s
-        light_shaft_props.cornerC = s, 0.0, -s
-        light_shaft_props.cornerD = -s, 0.0, -s
-        light_shaft_props.length = s * 4.0
-        light_shaft_props.direction = 0.0, 1.0, 0.0
-
-        ladder_props = item.ladder_extension_properties
-        ladder_props.bottom = 0.0, 0.0, -2.5
+        item.extension_type = type
 
         return item
 
     def delete_selected_extension(self):
         if not self.selected_extension:
-            return
+            return None
 
         self.extensions.remove(self.extension_index)
         self.extension_index = max(self.extension_index - 1, 0)
 
-    def duplicate_selected_extension(self) -> ExtensionProperties:
-        def _copy_property_group(dst: bpy.types.PropertyGroup, src: bpy.types.PropertyGroup):
-            if getattr(src, "offset_position", None) is not None:
-                # __annotations__ doesn't include `offset_position` as it is from a base class
-                # manually copy it instead
-                setattr(dst, "offset_position", getattr(src, "offset_position"))
-
-            for prop_name in src.__annotations__.keys():
-                src_value = getattr(src, prop_name)
-                if isinstance(src_value, bpy.types.PropertyGroup):
-                    _copy_property_group(getattr(dst, prop_name), src_value)
-                else:
-                    setattr(dst, prop_name, src_value)
-
-        src_ext = self.selected_extension
-        if not src_ext:
-            return None
-
-        new_ext: ExtensionProperties = self.extensions.add()
-        _copy_property_group(new_ext, src_ext)
-        self.extension_index = len(self.extensions) - 1
-        return new_ext
-
-    extensions: bpy.props.CollectionProperty(type=ExtensionProperties, name="Extensions")
+    extensions: bpy.props.CollectionProperty(
+        type=ExtensionProperties, name="Extensions")
     extension_index: bpy.props.IntProperty(name="Extension")
 
     @property

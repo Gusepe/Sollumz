@@ -42,19 +42,18 @@ def fragment_to_obj(frag_xml: Fragment, filepath: str):
         create_lights(frag_xml.lights, parent=frag_obj,
                       armature_obj=drawable_obj)
 
-    if not import_op.import_settings.ignore_embedded_col:
-        for id, lod_xml in frag_xml.get_lods_by_id().items():
-            if not lod_xml.groups:
-                continue
+    for id, lod_xml in frag_xml.get_lods_by_id().items():
+        if not lod_xml.groups:
+            continue
 
-            lod_obj = create_lod_obj(frag_obj, lod_xml, id)
-            group_objs = create_groups(lod_xml, lod_obj)
-            child_objs = create_children(lod_xml, group_objs, filepath, materials)
+        lod_obj = create_lod_obj(frag_obj, lod_xml, id)
+        group_objs = create_groups(lod_xml, lod_obj)
+        child_objs = create_children(lod_xml, group_objs, filepath, materials)
 
-            create_bounds(lod_xml, child_objs)
-            create_vehicle_windows(frag_xml, materials, child_objs)
+        create_bounds(lod_xml, child_objs)
+        create_vehicle_windows(frag_xml, materials, child_objs)
 
-            lod_obj.parent = frag_obj
+        lod_obj.parent = frag_obj
 
 
 def create_lod_obj(frag_obj: bpy.types.Object, lod_xml: LOD, id: int):

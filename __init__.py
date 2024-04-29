@@ -14,16 +14,14 @@
 import bpy
 import os
 from . import auto_load
-# from . import sollumz_debug
-from . import sollumz_tool
 
 
 bl_info = {
-    "name": "Sollumz",
-    "author": "Skylumz",
+    "name": "Sollumz-Grass",
+    "author": "Skylumz & GiZz",
     "description": "This plugins allows you to import/export codewalker xml files.",
     "blender": (3, 4, 1),
-    "version": (1, 0, 0),
+    "version": (2, 0, 0),
     "location": "",
     "warning": "",
     "category": "Import-Export"
@@ -32,15 +30,8 @@ bl_info = {
 
 auto_load.init()
 
-
 def register():
     auto_load.register()
 
-    # WorkSpaceTools need to be registered after normal modules so the keymaps
-    # detect the registed operators
-    sollumz_tool.register_tools()
-
 def unregister():
-    sollumz_tool.unregister_tools()
-
     auto_load.unregister()

@@ -28,20 +28,17 @@ from ..ybn.ybnexport import bound_from_object, composite_from_object
 from math import degrees, pi, isclose
 from mathutils import Quaternion, Vector
 from dataclasses import dataclass
-from .render_bucket import RenderBucket
 
 
 def get_used_materials(obj):
     materials = []
     for child in get_children_recursive(obj):
         if child.sollum_type == SollumType.DRAWABLE_GEOMETRY:
-            if child.type == 'MESH':
-                mesh = child.data
-                for poly in mesh.polygons:
-                    mat = mesh.materials[poly.material_index]
-                    if mat and mat.sollum_type == MaterialType.SHADER:
-                        if mat not in materials:
-                            materials.append(mat)
+            mats = child.data.materials
+            for mat in mats:
+                if mat.sollum_type == MaterialType.SHADER:
+                    if mat not in materials:
+                        materials.append(mat)
     return materials
 
 
@@ -53,7 +50,7 @@ def get_shaders_from_blender(materials):
         # Maybe make this a property?
         shader.name = material.shader_properties.name
         shader.filename = material.shader_properties.filename
-        shader.render_bucket = RenderBucket[material.shader_properties.renderbucket].value
+        shader.render_bucket = material.shader_properties.renderbucket
 
         for node in material.node_tree.nodes:
             if isinstance(node, bpy.types.ShaderNodeTexImage):

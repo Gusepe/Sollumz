@@ -1,9 +1,8 @@
 import bpy
-
+from mathutils import Vector
+from bpy.props import (EnumProperty, FloatProperty, PointerProperty, StringProperty, IntProperty, FloatVectorProperty, BoolProperty, IntVectorProperty, CollectionProperty)
 from ..tools.utils import int_to_bool_list, flag_prop_to_list, flag_list_to_int
-from bpy.props import (EnumProperty, FloatProperty, PointerProperty,
-                       StringProperty, IntProperty, FloatVectorProperty, BoolProperty)
-
+from ..tools.ymaphelper import ensure_grass_proc_model
 
 def update_uint_prop(self, context, var_name):
     """Work around for storing uint values as a Blender property (credits: CFox)"""
@@ -94,14 +93,14 @@ class YmapBlockProperties(bpy.types.PropertyGroup):
     owner: StringProperty(name="Owner")
     time: StringProperty(name="Time")
 
+class YmapPhysicsDictionariesList(bpy.types.PropertyGroup):
+    name: StringProperty(name="name")
 
 class YmapProperties(bpy.types.PropertyGroup):
     name: StringProperty(name="Name", default="untitled_ymap")
     parent: StringProperty(name="Parent", default="")
-    flags: IntProperty(name="Flags", default=0, min=0, max=3,
-                       update=FlagPropertyGroup.update_flags_total)
-    content_flags: IntProperty(name="Content Flags", default=0, min=0, max=(
-        2**11)-1, update=ContentFlagPropertyGroup.update_flags_total)
+    flags: IntProperty(name="Flags", default=0, min=0, max=3, update=FlagPropertyGroup.update_flags_total)
+    content_flags: IntProperty(name="Content Flags", default=0, min=0, max=(2**11)-1, update=ContentFlagPropertyGroup.update_flags_total)
 
     streaming_extents_min: FloatVectorProperty()
     streaming_extents_max: FloatVectorProperty()
@@ -111,20 +110,123 @@ class YmapProperties(bpy.types.PropertyGroup):
     flags_toggle: PointerProperty(type=MapFlags)
     content_flags_toggle: PointerProperty(type=ContentFlags)
 
-    block: PointerProperty(
-        type=YmapBlockProperties)
+    physicsDictionaries: CollectionProperty(type=YmapPhysicsDictionariesList)
+    
+    block: PointerProperty(type=YmapBlockProperties)
 
 
 class YmapModelOccluderProperties(bpy.types.PropertyGroup):
     model_occl_flags: IntProperty(name="Flags", default=0)
 
 
+class YmapGrassinstanceListProperties(bpy.types.PropertyGroup):
+    
+    IS_DOING_UPDATE = False
+    
+    def on_update_archetype_name(self, context):
+        
+        base_obj = ensure_grass_proc_model(context.active_object.ymap_grass_instance_list_properties.archetypeName)
+        
+        if not self.IS_DOING_UPDATE:
+            self.IS_DOING_UPDATE = True
+            for obj in context.selected_objects:
+                for child in obj.children:
+                    child.name = obj.ymap_grass_instance_list_properties.archetypeName
+                    child.data = base_obj.data.copy()
+            self.IS_DOING_UPDATE = False
+    
+    archetypeName: StringProperty(
+        name="Archetype name",
+        default="prop_grass_001_a",
+        update=on_update_archetype_name
+    )
+    
+    scaleRange: FloatVectorProperty(
+        name="Scale Range",
+        default=(1.0, 1.0, 1.0),
+    )
+    
+    lodDist: FloatProperty(
+        name="Grass LOD dist",
+        default=120.0,
+    )
+    
+    lodFadeStartDist: FloatProperty(
+        name="Grass LOD fade start dist",
+        default=15.0,
+    )
+    
+    lodInstFadeRange: FloatProperty(
+        name="Grass LOD inst fade range",
+        default=0.75,
+    )
+    
+    orientToTerrain: FloatProperty(
+        name="Grass orient to terrain",
+        default=1.0,
+        min=0.0,
+        max=1.0
+    )
+    
+class YmapGrassinstanceListItemProperties(bpy.types.PropertyGroup):
+    
+    IS_DOING_UPDATE = False
+    
+    def on_update_color(self, context):
+        if not self.IS_DOING_UPDATE:
+            self.IS_DOING_UPDATE = True
+            if context.active_object is not None:
+                for obj in context.selected_objects:
+                    _color = context.active_object.ymap_grass_instance_list_item_properties.color
+                    if obj.ymap_grass_instance_list_item_properties.color != _color:
+                        obj.ymap_grass_instance_list_item_properties.color = _color
+            self.IS_DOING_UPDATE = False
+
+    def on_update_scale(self, context):
+        if not self.IS_DOING_UPDATE:
+            self.IS_DOING_UPDATE = True
+            if context.active_object is not None:
+                for obj in context.selected_objects:
+                    _scale = context.active_object.ymap_grass_instance_list_item_properties.scale
+                    if obj.ymap_grass_instance_list_item_properties.scale != _scale:
+                        obj.ymap_grass_instance_list_item_properties.scale = _scale
+                    obj.scale = Vector([1,1,1]) * _scale
+            self.IS_DOING_UPDATE = False
+
+    color: FloatVectorProperty(
+        name="Grass color",
+        subtype='COLOR',
+        default=(0.5, 0.5, 0.5),
+        min=0.0,
+        max=1.0,
+        update=on_update_color
+    )
+  
+    scale: FloatProperty(
+        name="Grass scale",
+        default=0.0,
+        min=0.0,
+        max=1.0,
+        update=on_update_scale
+    )
+    
+    ao: FloatProperty(
+        name="Artificial occlusion",
+        default=1.0,
+        min=0.0,
+        max=1.0
+    )
+    
+    pad: IntVectorProperty(
+        name="Pad",
+        default=(0, 0, 0)
+    )
+
 class YmapCarGeneratorProperties(bpy.types.PropertyGroup):
     car_model: StringProperty(name="CarModel", default="panto")
     cargen_flags: IntProperty(name="Flags", default=0)
     pop_group: StringProperty(name="PopGroup", default="")
-    perpendicular_length: FloatProperty(
-        name="PerpendicularLength", default=2.3)
+    perpendicular_length: FloatProperty(name="PerpendicularLength", default=2.3)
     body_color_remap_1: IntProperty(name="BodyColorRemap1", default=-1)
     body_color_remap_2: IntProperty(name="BodyColorRemap2", default=-1)
     body_color_remap_3: IntProperty(name="BodyColorRemap3", default=-1)
@@ -134,13 +236,15 @@ class YmapCarGeneratorProperties(bpy.types.PropertyGroup):
 
 def register():
     bpy.types.Object.ymap_properties = PointerProperty(type=YmapProperties)
-    bpy.types.Object.ymap_model_occl_properties = PointerProperty(
-        type=YmapModelOccluderProperties)
-    bpy.types.Object.ymap_cargen_properties = PointerProperty(
-        type=YmapCarGeneratorProperties)
+    bpy.types.Object.ymap_model_occl_properties = PointerProperty(type=YmapModelOccluderProperties)
+    bpy.types.Object.ymap_grass_instance_list_properties = PointerProperty(type=YmapGrassinstanceListProperties)
+    bpy.types.Object.ymap_grass_instance_list_item_properties = PointerProperty(type=YmapGrassinstanceListItemProperties)
+    bpy.types.Object.ymap_cargen_properties = PointerProperty(type=YmapCarGeneratorProperties)
 
 
 def unregister():
     del bpy.types.Object.ymap_properties
     del bpy.types.Object.ymap_model_occl_properties
+    del bpy.types.Object.ymap_grass_instance_list_properties
+    del bpy.types.Object.ymap_grass_instance_list_item_properties
     del bpy.types.Object.ymap_cargen_properties
