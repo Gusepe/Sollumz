@@ -103,7 +103,9 @@ def entity_from_obj(obj):
 
 # TODO: This needs more work for non occluder object (entities )
 
-def calculate_extents_aabb(ymap, bbmin, bbmax):
+
+def calculate_extents(ymap, obj):
+    bbmin, bbmax = get_bound_extents(obj)
 
     ymap.entities_extents_min = get_min_vector(
         ymap.entities_extents_min, bbmin)
@@ -112,12 +114,8 @@ def calculate_extents_aabb(ymap, bbmin, bbmax):
     ymap.streaming_extents_min = get_min_vector(
         ymap.streaming_extents_min, bbmin)
     ymap.streaming_extents_max = get_max_vector(
-        ymap.streaming_extents_max, bbmax
-    )
+        ymap.streaming_extents_max, bbmax)
 
-def calculate_extents(ymap, obj):
-    bbmin, bbmax = get_bound_extents(obj)
-    return calculate_extents_aabb(ymap, bbmin, bbmax)
 
 def cargen_from_obj(obj):
     cargen = CarGenerator()
@@ -137,18 +135,6 @@ def cargen_from_obj(obj):
 
     return cargen
 
-def grass_instancelistdef_from_obj(obj, bbmin, bbmax):
-    inst = GrassInstance()
-    inst.BatchAABB = BatchAABB()
-    inst.BatchAABB.min = Vector([*bbmin, 0])
-    inst.BatchAABB.max = Vector([*bbmax, 0])
-    inst.archetypeName = obj.name.split('.')[0]
-    inst.ScaleRange = obj.scale
-    inst.lodDist = obj.ymap_grass_instance_list_properties.lodDist
-    inst.LodFadeStartDist = obj.ymap_grass_instance_list_properties.lodFadeStartDist
-    inst.LodInstFadeRange = obj.ymap_grass_instance_list_properties.lodFadeStartRange
-    inst.OrientToTerrain = obj.ymap_grass_instance_list_properties.orientToTerrain
-    
 
 def calculate_cargen_orient(obj):
     # *-1 because GTA likes to invert values
@@ -205,88 +191,6 @@ def ymap_from_object(export_op, obj, exportpath, export_settings=None):
                     export_op.report(
                         {'WARNING'}, f"Object {model.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_MODEL_OCCLUDER]} type.")
 
-        # Grass instances
-        if export_settings.ymap_instanced_data == False and child.sollum_type == SollumType.YMAP_GRASS_INSTANCED_DATA:
-            obj.ymap_properties.content_flags_toggle.has_grass = True
-            
-            ymap.physics_dictionaries = PhysicsDictionariesList()
-            
-            physics_dictionaries_names = [
-                'v_proc1',
-                'v_proc2'
-            ]
-            
-            for name in physics_dictionaries_names:
-                phy_dict = PhysicsDictionariesList.PhysicsDictionarie()
-                phy_dict.value = name
-                ymap.physics_dictionaries.append(phy_dict)
-            
-            ymap.instanced_data = InstancedDataProperty()
-            ymap.instanced_data.GrassInstanceList = GrassInstanceList()
-        
-            for x in child.children:
-                if x.sollum_type == SollumType.YMAP_GRASS_INSTANCE_LIST_DEF:
-                    
-                    instance_list_def = x
-                    
-                    bbmin = Vector([1, 1, 1]) * float('+inf')
-                    bbmax = Vector([1, 1, 1]) * float('-inf')
-                    
-                    for y in instance_list_def.children:
-                        if y.sollum_type == SollumType.YMAP_GRASS_INSTANCE:
-                            
-                            inst_obj = y
-                            world_loc = inst_obj.matrix_world.to_translation()
-                            
-                            if world_loc.x < bbmin.x:
-                                bbmin.x = world_loc.x
-                            if world_loc.y < bbmin.y:
-                                bbmin.y = world_loc.y
-                            if world_loc.z < bbmin.z:
-                                bbmin.z = world_loc.z
-
-                            if world_loc.x > bbmax.x:
-                                bbmax.x = world_loc.x
-                            if world_loc.y > bbmax.y:
-                                bbmax.y = world_loc.y
-                            if world_loc.z > bbmax.z:
-                                bbmax.z = world_loc.z
-                       
-                    instance = GrassInstance()
-                    
-                    instance.ScaleRange       = Vector(instance_list_def.ymap_grass_instance_list_properties.scaleRange)
-                    instance.archetypeName    = instance_list_def.ymap_grass_instance_list_properties.archetypeName
-                    instance.lodDist          = instance_list_def.ymap_grass_instance_list_properties.lodDist
-                    instance.LodFadeStartDist = instance_list_def.ymap_grass_instance_list_properties.lodFadeStartDist
-                    instance.LodInstFadeRange = instance_list_def.ymap_grass_instance_list_properties.lodInstFadeRange
-                    instance.OrientToTerrain  = instance_list_def.ymap_grass_instance_list_properties.orientToTerrain
-                    
-                    instance.BatchAABB.min = Vector([*bbmin, 0])
-                    instance.BatchAABB.max = Vector([*bbmax, 0])
-                                                
-                    for y in instance_list_def.children:
-                        if y.sollum_type == SollumType.YMAP_GRASS_INSTANCE:
-                            
-                            inst_obj = y                               
-                            item = GrassInstanceItem()
-                            
-                            item.Position = item.get_local_pos(Vector([0, 0, 0]), inst_obj.matrix_world.to_translation(), instance.BatchAABB)
-                            
-                            normal = (inst_obj.matrix_world.to_quaternion() @ Vector((0, 0, 1)) + Vector((1, 1, 0))) / 2 * 255
-                            item.NormalX = int(normal.x)
-                            item.NormalY = int(normal.y)
-                            
-                            item.Color = [int(z*255) for z in inst_obj.ymap_grass_instance_list_item_properties.color]
-                            item.Scale = int(inst_obj.scale.x * 255)
-                            item.Ao = int(inst_obj.ymap_grass_instance_list_item_properties.ao*255)
-                            item.Pad = inst_obj.ymap_grass_instance_list_item_properties.pad
-                            
-                            instance.InstanceList.append(item)
-                    
-                    ymap.instanced_data.GrassInstanceList.append(instance)
-                                
-                    calculate_extents_aabb(ymap, bbmin, bbmax)
-                
         # TODO: physics_dictionaries
 
         # TODO: time cycle
@@ -312,7 +216,7 @@ def ymap_from_object(export_op, obj, exportpath, export_settings=None):
     # TODO: Calc extents
 
     ymap.block.version = obj.ymap_properties.block.version
-    ymap.block.flags = obj.ymap_properties.block.flags
+    ymap.block.versiflagson = obj.ymap_properties.block.flags
     ymap.block.name = obj.ymap_properties.block.name
     ymap.block.exported_by = obj.ymap_properties.block.exported_by
     ymap.block.owner = obj.ymap_properties.block.owner

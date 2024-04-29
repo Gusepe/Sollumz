@@ -113,27 +113,6 @@ class ExpressionExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProper
 
 
 class LightShaftExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProperties):
-    density_type: bpy.props.EnumProperty(
-        items=[(item.value, item.value, "") for item in LightShaftDensityType], name="Density Type")
-    volume_type: bpy.props.EnumProperty(
-        items=[(item.value, item.value, "") for item in LightShaftVolumeType], name="Volume Type")
-    scale_by_sun_intensity: bpy.props.BoolProperty(
-        name="Scale by Sun Intensity")        
-    direction_amount: bpy.props.FloatProperty(name="Direction Amount")
-    length: bpy.props.FloatProperty(name="Length")
-    color: bpy.props.FloatVectorProperty(
-        name="Color", subtype="COLOR", min=0, max=1, size=4, default=(1, 1, 1, 1))
-    intensity: bpy.props.FloatProperty(name="Intensity")
-    flashiness: bpy.props.IntProperty(name="Flashiness")
-    flags: bpy.props.IntProperty(name="Flags")
-    fade_in_time_start: bpy.props.FloatProperty(name="Fade In Time Start")
-    fade_in_time_end: bpy.props.FloatProperty(name="Fade In Time End")
-    flashiness: bpy.props.IntProperty(name="Flashiness")
-    fade_out_time_start: bpy.props.FloatProperty(name="Fade Out Time Start")
-    fade_out_time_end: bpy.props.FloatProperty(name="Fade Out Time End")
-    fade_distance_start: bpy.props.FloatProperty(name="Fade Distance Start")
-    fade_distance_end: bpy.props.FloatProperty(name="Fade Distance End")
-    softness: bpy.props.FloatProperty(name="Softness")
     cornerA: bpy.props.FloatVectorProperty(
         name="Corner A", subtype="TRANSLATION")
     cornerB: bpy.props.FloatVectorProperty(
@@ -144,7 +123,28 @@ class LightShaftExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProper
         name="Corner D", subtype="TRANSLATION")
     direction: bpy.props.FloatVectorProperty(
         name="Direction", subtype="XYZ")
-
+    direction_amount: bpy.props.FloatProperty(name="Direction Amount")
+    length: bpy.props.FloatProperty(name="Length")
+    color: bpy.props.FloatVectorProperty(
+        name="Color", subtype="COLOR", min=0, max=1, size=4, default=(1, 1, 1, 1))
+    intensity: bpy.props.FloatProperty(name="Intensity")
+    flashiness: bpy.props.IntProperty(name="Flashiness")
+    flags: bpy.props.IntProperty(name="Flags")
+    fade_in_time_start: bpy.props.FloatProperty(name="Fade In Time Start")
+    fade_in_time_end: bpy.props.FloatProperty(name="Fade In Time End")
+    flashiness: bpy.props.IntProperty(name="Flashiness")
+    flag: bpy.props.IntProperty(name="Flags")
+    fade_out_time_start: bpy.props.FloatProperty(name="Fade Out Time Start")
+    fade_out_time_end: bpy.props.FloatProperty(name="Fade Out Time End")
+    fade_distance_start: bpy.props.FloatProperty(name="Fade Distance Start")
+    fade_distance_end: bpy.props.FloatProperty(name="Fade Distance End")
+    softness: bpy.props.FloatProperty(name="Softness")
+    scale_by_sun_intensity: bpy.props.BoolProperty(
+        name="Scale by Sun Intensity")
+    density_type: bpy.props.EnumProperty(
+        items=[(item.value, item.value, "") for item in LightShaftDensityType], name="Density Type")
+    volume_type: bpy.props.EnumProperty(
+        items=[(item.value, item.value, "") for item in LightShaftVolumeType], name="Volume Type")
 
 
 class SpawnPointExtensionProperties(bpy.types.PropertyGroup, BaseExtensionProperties):

@@ -17,11 +17,11 @@ from . import auto_load
 
 
 bl_info = {
-    "name": "Sollumz-Grass",
-    "author": "Skylumz & GiZz",
+    "name": "Sollumz - Last",
+    "author": "Skylumz",
     "description": "This plugins allows you to import/export codewalker xml files.",
     "blender": (3, 4, 1),
-    "version": (2, 0, 0),
+    "version": (2, 5, 0),
     "location": "",
     "warning": "",
     "category": "Import-Export"
@@ -30,8 +30,10 @@ bl_info = {
 
 auto_load.init()
 
+
 def register():
     auto_load.register()
+
 
 def unregister():
     auto_load.unregister()

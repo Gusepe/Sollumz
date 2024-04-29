@@ -1,9 +1,8 @@
 import bpy
 import numpy
-from mathutils import Vector, Matrix
 from ...sollumz_operators import SOLLUMZ_OT_base, SearchEnumHelper
-from ...tools.blenderhelper import get_selected_vertices, get_selected_edit_vertices
-from ..utils import get_selected_archetype, get_selected_portal, get_selected_room, validate_dynamic_enums, validate_dynamic_enum
+from ...tools.blenderhelper import get_selected_vertices
+from ..utils import get_selected_archetype, get_selected_portal, get_selected_room
 from bpy_extras.view3d_utils import location_3d_to_region_2d
 from ..properties.mlo import PortalProperties, get_room_items
 
@@ -19,10 +18,7 @@ class SOLLUMZ_OT_create_portal(SOLLUMZ_OT_base, bpy.types.Operator):
 
     def run(self, context):
         selected_archetype = get_selected_archetype(context)
-        portal = selected_archetype.new_portal()
-
-        portal.room_from_id = context.scene.sollumz_add_portal_room_from
-        portal.room_to_id = context.scene.sollumz_add_portal_room_to
+        selected_archetype.new_portal()
 
         return True
 
@@ -32,58 +28,9 @@ class PortalCreatorHelper:
     def poll(cls, context):
         return get_selected_archetype(context) is not None and (context.active_object and context.active_object.mode == "EDIT")
 
-    def execute(self, context: bpy.types.Context):
-        selected_archetype = get_selected_archetype(context)
-
-        if selected_archetype.asset is not None:
-            matrix = selected_archetype.asset.matrix_world
-        else:
-            matrix = Matrix()
-
-        portal = self.get_portal(context)
-
-        self.set_portal_corners_to_selected_verts(context, portal, matrix)
-
-        # Force gizmo redraw
-        bpy.ops.object.mode_set(mode="OBJECT")
-        bpy.ops.object.mode_set(mode="EDIT")
-
-        return {"FINISHED"}
-
-    def get_portal(self, context) -> PortalProperties:
-        ...
-
-    def get_selected_portal_verts(self, context: bpy.types.Context):
-        selected_verts = []
-
-        for obj in context.objects_in_mode:
-            selected_verts.extend(
-                [obj.matrix_world @ v for v in get_selected_edit_vertices(obj.data)])
-
-        return selected_verts
-
-    def set_portal_corners_to_selected_verts(self, context: bpy.types.Context, portal: PortalProperties, composite_matrix: Matrix):
-        """Set portal corners to selected verts in winding order."""
-        selected_verts = self.get_selected_portal_verts(context)
-
-        if len(selected_verts) != 4:
-            self.report({"INFO"}, "You must select exactly 4 vertices.")
-            return False
-
-        sort_order = PortalCreatorHelper.sort_coords_2d_winding(selected_verts)
-
-        # Unapply the Bound Composite matrix since that is applied to the Gizmo
-        sorted_verts = [composite_matrix.inverted() @ selected_verts[i]
-                        for i in sort_order]
-
-        portal.corner1 = sorted_verts[2]
-        portal.corner2 = sorted_verts[1]
-        portal.corner3 = sorted_verts[0]
-        portal.corner4 = sorted_verts[3]
-
     @staticmethod
     def sort_coords_2d_winding(coords: list[tuple[float, float, float]]):
-        """Sort 4 3D points in a winding order by projecting the coords to 2D. Returns sort order"""
+        """Sort 4 3D points in a winding order by projecting the coords to 2D."""
         # Thank you Pranav! https://stackoverflow.com/a/70624269/11903486
         screen_coords = PortalCreatorHelper.get_screen_coords(coords)
 
@@ -93,7 +40,10 @@ class PortalCreatorHelper:
         vector_angle = numpy.arctan2(
             vector_from_centroid[:, 1], vector_from_centroid[:, 0])
         # Find the indices that give a sorted vector_angle array
-        return list(numpy.argsort(-vector_angle))
+        sort_order = list(numpy.argsort(-vector_angle))
+
+        # Apply sort_order to original pts array.
+        return [coords[i] for i in sort_order]
 
     @staticmethod
     def get_screen_coords(coords_3d: list[tuple[float, float, float]]) -> list[tuple[float, float]]:
@@ -103,40 +53,85 @@ class PortalCreatorHelper:
 
         screen_coords = []
         for coord in coords_3d:
-            screen_coords.append(
-                location_3d_to_region_2d(region, region_3d, coord))
+            # TODO: Fails here. location_3d_to_region_2d returns None because the portal coords are behind the viewport (when transformed by obj.matrix_world)
+            screen_coords.append(location_3d_to_region_2d(
+                region, region_3d, coord))
 
         return screen_coords
 
+    @staticmethod
+    def is_coplanar(points: list[tuple[float, float, float]]):
+        """Check if 4 3D points lie on the same plane."""
+        leg1 = points[1] - points[0]
+        leg2 = points[2] - points[0]
+        leg3 = points[3] - points[0]
 
-class SOLLUMZ_OT_create_portal_from_selection(PortalCreatorHelper, bpy.types.Operator):
+        return leg3.dot(leg1.cross(leg2)) == 0
+
+    def get_selected_portal_verts(self, context):
+        selected_verts = []
+
+        selected_archetype = get_selected_archetype(context)
+
+        if selected_archetype.asset is None:
+            self.message("You must set an asset for this mlo archetype.")
+            return selected_verts
+
+        for obj in context.objects_in_mode:
+            selected_verts.extend(
+                [vert for vert in get_selected_vertices(obj)])
+
+        return selected_verts
+
+    def set_portal_corners_to_selected_verts(self, context, portal: PortalProperties, offset: tuple[float, float, float]):
+        """Set portal corners to selected verts in winding order."""
+        selected_verts = self.get_selected_portal_verts(context)
+
+        if len(selected_verts) != 4:
+            self.message("You must select exactly 4 vertices.")
+            return False
+
+        if not PortalCreatorHelper.is_coplanar(selected_verts):
+            self.warning(
+                "Selection of points are not coplanar. This may cause issues with the portal.")
+
+        sorted_verts = PortalCreatorHelper.sort_coords_2d_winding(
+            selected_verts)
+
+        portal.corner1 = sorted_verts[2] - offset
+        portal.corner2 = sorted_verts[1] - offset
+        portal.corner3 = sorted_verts[0] - offset
+        portal.corner4 = sorted_verts[3] - offset
+
+        return True
+
+
+class SOLLUMZ_OT_create_portal_from_selection(PortalCreatorHelper, SOLLUMZ_OT_base, bpy.types.Operator):
     """Create a portal from selected verts"""
     bl_idname = "sollumz.createportalfromselection"
     bl_label = "Create Portal From Verts"
-    bl_options = {"REGISTER", "UNDO"}
 
-    def get_portal(self, context):
+    def run(self, context):
         selected_archetype = get_selected_archetype(context)
+
+        portal_offset = selected_archetype.asset.location
         new_portal = selected_archetype.new_portal()
 
-        new_portal.room_from_id = context.scene.sollumz_add_portal_room_from
-        new_portal.room_to_id = context.scene.sollumz_add_portal_room_to
-
-        return new_portal
+        return self.set_portal_corners_to_selected_verts(context, new_portal, portal_offset)
 
 
-class SOLLUMZ_OT_update_portal_from_selection(PortalCreatorHelper, bpy.types.Operator):
+class SOLLUMZ_OT_update_portal_from_selection(PortalCreatorHelper, SOLLUMZ_OT_base, bpy.types.Operator):
     """Update a portal from selected verts"""
     bl_idname = "sollumz.updateportalfromselection"
     bl_label = "Update Portal From Verts"
-    bl_options = {"REGISTER", "UNDO"}
 
-    @classmethod
-    def poll(cls, context):
-        return super().poll(context) and get_selected_portal(context) is not None
+    def run(self, context):
+        selected_archetype = get_selected_archetype(context)
+        selected_portal = get_selected_portal(context)
 
-    def get_portal(self, context):
-        return get_selected_portal(context)
+        portal_offset = selected_archetype.asset.location
+
+        return self.set_portal_corners_to_selected_verts(context, selected_portal, portal_offset)
 
 
 class SOLLUMZ_OT_delete_portal(SOLLUMZ_OT_base, bpy.types.Operator):
@@ -155,16 +150,7 @@ class SOLLUMZ_OT_delete_portal(SOLLUMZ_OT_base, bpy.types.Operator):
             selected_archetype.portal_index - 1, 0)
         # Force redraw of gizmos
         context.space_data.show_gizmo = context.space_data.show_gizmo
-
-        validate_dynamic_enums(
-            selected_archetype.entities, "attached_portal_id", selected_archetype.portals)
-        validate_dynamic_enum(
-            context.scene, "sollumz_add_entity_portal", selected_archetype.portals)
-        validate_dynamic_enum(
-            context.scene, "sollumz_entity_filter_portal", selected_archetype.portals)
-
         return True
-
 
 class SOLLUMZ_OT_flip_portal(bpy.types.Operator):
     """Flip portal direction"""
@@ -186,7 +172,6 @@ class SOLLUMZ_OT_flip_portal(bpy.types.Operator):
             selected_portal.corner1 = corners[3]
 
         return {"FINISHED"}
-
 
 class SetPortalRoomHelper(SOLLUMZ_OT_base):
     bl_label = "Set to Selected"
@@ -243,3 +228,4 @@ class SOLLUMZ_OT_search_portal_room_to(SearchEnumHelper, bpy.types.Operator):
 
     def get_data_block(self, context):
         return get_selected_portal(context)
+

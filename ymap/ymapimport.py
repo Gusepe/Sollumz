@@ -3,15 +3,15 @@ import struct
 import math
 import os
 import bpy
-import bmesh
 
 from mathutils import Vector, Euler
-from ..sollumz_helper import duplicate_object_with_children, set_object_collection, mesh_join, hide_set_obj_and_children, delete_obj_and_children
-from ..tools.ymaphelper import *
+from ..sollumz_helper import duplicate_object_with_children, set_object_collection
+from ..tools.ymaphelper import add_occluder_material
 from ..sollumz_properties import SollumType
 from ..cwxml.ymap import CMapData, OccludeModel, YMAP
-from ..cwxml.drawable import YDR
-from ..ydr.ydrimport import drawable_to_obj
+
+# TODO: Make better?
+
 
 def get_mesh_data(model: OccludeModel):
     result = ([], [])
@@ -31,6 +31,7 @@ def get_mesh_data(model: OccludeModel):
         result[1].append((i0, i1, i2))
 
     return result
+
 
 def apply_entity_properties(obj, entity):
     obj.entity_properties.archetype_name = entity.archetype_name
@@ -54,7 +55,6 @@ def apply_entity_properties(obj, entity):
 
 
 def entity_to_obj(self, ymap_obj: bpy.types.Object, ymap: CMapData, import_settings):
-    
     group_obj = bpy.data.objects.new("Entities", None)
     group_obj.sollum_type = SollumType.YMAP_ENTITY_GROUP
     group_obj.parent = ymap_obj
@@ -158,7 +158,8 @@ def model_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
         model_obj = bpy.data.objects.new("Model", mesh)
         model_obj.sollum_type = SollumType.YMAP_MODEL_OCCLUDER
         model_obj.ymap_properties.flags = model.flags
-        model_obj.active_material = add_occluder_material(SollumType.YMAP_MODEL_OCCLUDER)
+        model_obj.active_material = add_occluder_material(
+            SollumType.YMAP_MODEL_OCCLUDER)
         bpy.context.collection.objects.link(model_obj)
         bpy.context.view_layer.objects.active = model_obj
         mesh.from_pydata(verts, [], faces)
@@ -167,72 +168,7 @@ def model_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
         model_obj.lock_rotation = (True, True, True)
         model_obj.lock_scale = (True, True, True)
 
-def grass_to_obj(obj: bpy.types.Object, ymap: CMapData, import_settings):
 
-    group_obj = bpy.data.objects.new('Grass Instances', None)
-    group_obj.parent = obj
-
-    bpy.context.collection.objects.link(group_obj)
-    bpy.context.view_layer.objects.active = group_obj
-
-    group_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCED_DATA
-
-    obj.ymap_properties.content_flags_toggle.has_grass = True
-    
-    i=0
-    l_gil=len(ymap.instanced_data.GrassInstanceList)
-    for instance in ymap.instanced_data.GrassInstanceList:
-        
-        print('processing instance ' + str(i+1) + '/' + str(l_gil))
-        
-        subgroup_obj = bpy.data.objects.new('Grass instance', None)
-        subgroup_obj.parent = group_obj
-        subgroup_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE_LIST_DEF
-        #subgroup_obj.location = instance.BatchAABB.get_center()
-        #subgroup_obj.scale = instance.ScaleRange
-        
-        subgroup_obj.ymap_grass_instance_list_properties.scaleRange       = instance.ScaleRange
-        subgroup_obj.ymap_grass_instance_list_properties.archetypeName    = instance.archetypeName
-        subgroup_obj.ymap_grass_instance_list_properties.lodDist          = instance.lodDist
-        subgroup_obj.ymap_grass_instance_list_properties.lodFadeStartDist = instance.LodFadeStartDist
-        subgroup_obj.ymap_grass_instance_list_properties.lodInstFadeRange = instance.LodInstFadeRange
-        subgroup_obj.ymap_grass_instance_list_properties.orientToTerrain  = instance.OrientToTerrain
-        
-        bpy.context.collection.objects.link(subgroup_obj)
-        bpy.context.view_layer.objects.active = subgroup_obj
-        
-        for x in instance.InstanceList:
-            
-            base_obj = ensure_grass_proc_model(instance.archetypeName)
-            
-            model_obj = base_obj.copy()
-            model_obj.rotation_mode = 'QUATERNION'
-            
-            model_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE
-            
-            model_obj.ymap_grass_instance_list_item_properties.position = x.Position
-            model_obj.ymap_grass_instance_list_item_properties.normalX = x.NormalX
-            model_obj.ymap_grass_instance_list_item_properties.normalY = x.NormalY
-            model_obj.ymap_grass_instance_list_item_properties.color = [y/255 for y in x.Color]
-            model_obj.ymap_grass_instance_list_item_properties.scale = x.Scale/255
-            model_obj.ymap_grass_instance_list_item_properties.ao = x.Ao/255
-            model_obj.ymap_grass_instance_list_item_properties.pad = x.Pad
-            
-            bpy.context.collection.objects.link(model_obj)
-            bpy.context.view_layer.objects.active = model_obj
-            model_obj.parent = subgroup_obj
-            model_obj.location = x.get_world_pos(instance.BatchAABB)# - subgroup_obj.location
-            
-            normal_x = (x.NormalX / 255) * 2 - 1
-            normal_y = (x.NormalY / 255) * 2 - 1
-            normal_z = math.sqrt(1 - normal_x ** 2 + normal_y ** 2)
-            
-            model_obj.rotation_quaternion = Vector((normal_x, normal_y, normal_z)).normalized().to_track_quat('Z', 'Y')
-            
-            model_obj.scale = Vector((1, 1, 1)) * (x.Scale/255)
-    
-        i += 1
-            
 def cargen_to_obj(import_op, obj: bpy.types.Object, ymap: CMapData):
     group_obj = bpy.data.objects.new("Car Generators", None)
     group_obj.sollum_type = SollumType.YMAP_CAR_GENERATOR_GROUP
@@ -301,10 +237,6 @@ def ymap_to_obj(import_op, ymap: CMapData, import_settings):
     if import_settings.ymap_model_occluders == False and len(ymap.occlude_models) > 0:
         model_to_obj(import_op, ymap_obj, ymap)
 
-    # Grass instances
-    if import_settings.ymap_instanced_data == False:
-        grass_to_obj(ymap_obj, ymap, import_settings)
-
     # TODO: physics_dictionaries
 
     # TODO: time cycle
@@ -316,7 +248,6 @@ def ymap_to_obj(import_op, ymap: CMapData, import_settings):
     # TODO: lod ligths
 
     # TODO: distant lod lights
-    
 
     ymap_obj.ymap_properties.block.version = str(ymap.block.version)
     ymap_obj.ymap_properties.block.flags = str(ymap.block.flags)

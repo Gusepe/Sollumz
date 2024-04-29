@@ -1,40 +1,18 @@
 import bpy
 from ...tabbed_panels import TabbedPanelHelper, TabPanel
-from ...sollumz_ui import BasicListHelper, FlagsPanel, FilterListHelper, draw_list_with_add_remove
+from ...sollumz_ui import BasicListHelper, FlagsPanel, OrderListHelper, draw_list_with_add_remove
 from ..properties.ytyp import ArchetypeType
-from ..properties.mlo import EntityProperties, MloEntityProperties
+from ..properties.mlo import EntityProperties
 from ..utils import get_selected_archetype, get_selected_entity
 from .extensions import ExtensionsListHelper, ExtensionsPanelHelper
 from .mlo import SOLLUMZ_PT_MLO_PANEL
 
 
-class SOLLUMZ_UL_ENTITIES_LIST(BasicListHelper, FilterListHelper, bpy.types.UIList):
+class SOLLUMZ_UL_ENTITIES_LIST(BasicListHelper, OrderListHelper, bpy.types.UIList):
     bl_idname = "SOLLUMZ_UL_ENTITIES_LIST"
     name_prop = "archetype_name"
-    order_by_name_key = "archetype_name"
+    orderkey = "archetype_name"
     item_icon = "OBJECT_DATA"
-
-    def filter_item(self, item: MloEntityProperties):
-        scene = bpy.context.scene
-        filter_type = scene.sollumz_entity_filter_type
-
-        if filter_type == "all":
-            return True
-
-        if filter_type == "room":
-            return scene.sollumz_entity_filter_room == item.attached_room_id
-        elif filter_type == "portal":
-            return scene.sollumz_entity_filter_portal == item.attached_portal_id
-        elif filter_type == "entity_set":
-            in_entity_set = scene.sollumz_entity_filter_entity_set == item.attached_entity_set_id
-            in_room = scene.sollumz_entity_filter_entity_set_room == item.attached_room_id
-
-            if scene.sollumz_do_entity_filter_entity_set_room:
-                return in_entity_set and in_room
-
-            return in_entity_set
-
-        return True
 
 
 class SOLLUMZ_PT_MLO_ENTITY_LIST_PANEL(TabPanel, bpy.types.Panel):
@@ -49,6 +27,7 @@ class SOLLUMZ_PT_MLO_ENTITY_LIST_PANEL(TabPanel, bpy.types.Panel):
 
     bl_order = 2
 
+
     @classmethod
     def poll_tab(cls, context):
         selected_archetype = get_selected_archetype(context)
@@ -62,36 +41,12 @@ class SOLLUMZ_PT_MLO_ENTITY_LIST_PANEL(TabPanel, bpy.types.Panel):
 
         list_col = draw_list_with_add_remove(self.layout, "sollumz.createmloentity", "sollumz.deletemloentity",
                                              SOLLUMZ_UL_ENTITIES_LIST.bl_idname, "", selected_archetype, "entities", selected_archetype, "entity_index")
-
-        filter_type = context.scene.sollumz_entity_filter_type
-
-        row = list_col.row()
-        col = row.column()
-        col_row = col.row()
-        col_row.label(text="Filter By", icon="FILTER")
-        col_row.prop(context.scene, "sollumz_entity_filter_type", text="")
-
-        if filter_type == "room":
-            row.prop(context.scene, "sollumz_entity_filter_room", text="")
-        elif filter_type == "portal":
-            row.prop(context.scene, "sollumz_entity_filter_portal", text="")
-        elif filter_type == "entity_set":
-            col = row.column()
-            col.prop(context.scene, "sollumz_entity_filter_entity_set", text="")
-            col.separator()
-            row = col.row()
-            row.prop(context.scene, "sollumz_do_entity_filter_entity_set_room")
-            row.separator()
-            col = row.column()
-            col.enabled = context.scene.sollumz_do_entity_filter_entity_set_room
-            col.prop(context.scene,
-                     "sollumz_entity_filter_entity_set_room", text="")
-            list_col.separator()
-
-        list_col.separator(factor=2)
+        list_col.separator()
         row = list_col.row(align=True)
         row.operator("sollumz.addobjasentity", icon="OUTLINER_OB_MESH")
-
+        row.prop(context.scene, "sollumz_add_entity_portal",
+                 text="", icon="OUTLINER_OB_LIGHTPROBE")
+        row.prop(context.scene, "sollumz_add_entity_room", text="", icon="CUBE")
         list_col.operator("sollumz.setobjentitytransforms",
                           icon="OUTLINER_DATA_EMPTY")
 
@@ -131,7 +86,6 @@ class SOLLUMZ_PT_MLO_ENTITY_PANEL(TabPanel, bpy.types.Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        selected_archetype = get_selected_archetype(context)
         selected_entity = get_selected_entity(context)
 
         layout.prop(selected_entity, "linked_object")
@@ -149,6 +103,12 @@ class SOLLUMZ_PT_MLO_ENTITY_PANEL(TabPanel, bpy.types.Panel):
         row = layout.row(align=True)
         row.prop(selected_entity, "attached_entity_set_id")
         row.operator("sollumz.search_entityset", text="", icon="VIEWZOOM")
+
+        row = layout.row(align=True)
+        row.prop(selected_entity, "attached_entity_set_room_id")
+        row.operator("sollumz.search_entitysets_rooms", text="", icon="VIEWZOOM")
+        
+        
 
         layout.separator()
 

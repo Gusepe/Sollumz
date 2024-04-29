@@ -579,10 +579,10 @@ class SOLLUMZ_OT_debug_fix_light_intensity(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class SOLLUMZ_OT_debug_reload_entity_sets(bpy.types.Operator):
-    bl_idname = "sollumz.debug_reload_entity_sets"
-    bl_label = "Reload Entity Sets"
-    bl_description = "Reload old entity set entities."
+class SOLLUMZ_OT_debug_update_portal_names(bpy.types.Operator):
+    bl_idname = "sollumz.debug_update_portal_names"
+    bl_label = "Update Portal Names"
+    bl_description = "Update all portal names in the blend file based on room from/to."
     bl_options = {"UNDO"}
 
     def execute(self, context):
@@ -591,13 +591,8 @@ class SOLLUMZ_OT_debug_reload_entity_sets(bpy.types.Operator):
                 if archetype.type != ArchetypeType.MLO:
                     continue
 
-                for entity_set in archetype.entity_sets:
-                    for entity in entity_set.entities:
-                        new_entity = archetype.new_entity()
-                        for k, v in entity.items():
-                            new_entity[k] = v
-
-                        new_entity.attached_entity_set_id = str(entity_set.id)
+                for portal in archetype.portals:
+                    portal.update_name(context)
 
         return {"FINISHED"}
 

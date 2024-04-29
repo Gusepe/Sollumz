@@ -55,10 +55,8 @@ class SollumType(str, Enum):
     YMAP_BOX_OCCLUDER = "sollumz_ymap_box_occluder"
     YMAP_MODEL_OCCLUDER = "sollumz_ymap_model_occluder"
     YMAP_CAR_GENERATOR = "sollumz_ymap_car_generator"
-    YMAP_GRASS_INSTANCED_DATA = "sollumz_ymap_grass_instanced_data"
-    YMAP_GRASS_INSTANCE_LIST_DEF = "sollumz_ymap_grass_instance_list_def"
-    YMAP_GRASS_INSTANCE = "sollumz_ymap_grass_instance"
-    
+
+
 class LightType(str, Enum):
     NONE = "sollumz_light_none"
     POINT = "sollumz_light_point"
@@ -114,7 +112,6 @@ class TextureFormat(str, Enum):
     A1R5G5B5 = "sollumz_a1r5g5b5"
     A1R8G8B8 = "sollumz_a1r8g8b8"
     A8R8G8B8 = "sollumz_a8r8g8b8"
-    A8B8G8R8 = "sollumz_a8b8g8r8"
     A8 = "sollumz_a8"
     L8 = "sollumz_l8"
 
@@ -269,9 +266,6 @@ SOLLUMZ_UI_NAMES = {
     SollumType.YMAP_BOX_OCCLUDER: "Box Occluder",
     SollumType.YMAP_MODEL_OCCLUDER: "Model Occluder",
     SollumType.YMAP_CAR_GENERATOR: "Car Generator",
-    SollumType.YMAP_GRASS_INSTANCED_DATA: "Grass instanced data",
-    SollumType.YMAP_GRASS_INSTANCE_LIST_DEF: "Grass instance list def",
-    SollumType.YMAP_GRASS_INSTANCE: "Grass instance",
 
     MaterialType.NONE: "None",
     MaterialType.SHADER: "Sollumz Material",
@@ -316,7 +310,6 @@ SOLLUMZ_UI_NAMES = {
     TextureFormat.A1R5G5B5: "D3DFMT_A1R5G5B5",
     TextureFormat.A1R8G8B8: "D3DFMT_A1R8G8B8",
     TextureFormat.A8R8G8B8: "D3DFMT_A8R8G8B8",
-    TextureFormat.A8B8G8R8: "D3DFMT_A8B8G8R8",
     TextureFormat.A8: "D3DFMT_A8",
     TextureFormat.L8: "D3DFMT_L8",
 
@@ -586,12 +579,6 @@ class SollumzImportSettings(bpy.types.PropertyGroup):
         description="If enabled, ignore all Car Generators from the selected ymap(s).",
         default=False,
     )
-    
-    ymap_instanced_data: bpy.props.BoolProperty(
-        name="Exclude Grass Instances",
-        description="If enabled, ignore all Grass Instances from the selected ymap(s).",
-        default=False,
-    )
 
 
 class SollumzExportSettings(bpy.types.PropertyGroup):
@@ -639,7 +626,7 @@ class SollumzExportSettings(bpy.types.PropertyGroup):
     use_selection: bpy.props.BoolProperty(
         name="Selected Objects",
         description="Export selected and visible objects only",
-        default=True,
+        default=False,
     )
 
     use_active_collection: bpy.props.BoolProperty(
@@ -651,7 +638,7 @@ class SollumzExportSettings(bpy.types.PropertyGroup):
     auto_calculate_bone_tag: bpy.props.BoolProperty(
         name="Auto Calculate Bone Tag",
         description="Automatically calculate bone tags.",
-        default=False,
+        default=True,
     )
 
     export_with_hi: bpy.props.BoolProperty(
@@ -707,14 +694,6 @@ class SollumzExportSettings(bpy.types.PropertyGroup):
         description="If enabled, ignore all Car Generators from the selected ymap(s).",
         default=False,
     )
-    
-    ymap_instanced_data: bpy.props.BoolProperty(
-        name="Exclude Grass Instances",
-        description="If enabled, ignore all Grass Instances from the selected ymap(s).",
-        default=False,
-    )
-
-
 
 class SollumzAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__.split(".")[0]
@@ -724,16 +703,14 @@ class SollumzAddonPreferences(bpy.types.AddonPreferences):
 
     show_vertex_painter: bpy.props.BoolProperty(
         name="Show Vertex Painter", description="Show the Vertex Painter panel in General Tools (Includes Terrain Painter)", default=True)
-
-    extra_color_swatches: bpy.props.BoolProperty(
-        name="Extra Vertex Color Swatches", description="Add 3 extra color swatches to the Vertex Painter Panel (Max 6)", default=True)
+    
+    extra_color_swatches: bpy.props.BoolProperty(name="Extra Vertex Color Swatches", description="Add 3 extra color swatches to the Vertex Painter Panel (Max 6)", default=True)
 
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "scale_light_intensity")
         layout.prop(self, "show_vertex_painter")
         layout.prop(self, "extra_color_swatches")
-
 
 def get_all_collections():
     return [bpy.context.scene.collection, *bpy.data.collections]
@@ -952,7 +929,6 @@ def register():
         name="Limit to Selected", description="Only set intensity of the selected lights. (All instances will be affected)")
 
     bpy.utils.register_class(SollumzAddonPreferences)
-
 
 def unregister():
     del bpy.types.Object.sollum_type

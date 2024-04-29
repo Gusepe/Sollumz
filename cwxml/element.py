@@ -504,22 +504,3 @@ class TextListProperty(ElementProperty):
         elem = ET.Element(self.tag_name)
         elem.text = " ".join(self.value)
         return elem
-    
-class IntListProperty(ElementProperty):
-    """Separates each word of an element's text into a list"""
-    value_types = (list)
-
-    def __init__(self, tag_name, value=None):
-        super().__init__(tag_name, value or [])
-
-    @staticmethod
-    def from_xml(element):
-        return IntListProperty(element.tag, value=[int(x) for x in element.text.split(" ")])
-
-    def to_xml(self):
-        if not self.value or len(self.value) < 1:
-            return None
-
-        elem = ET.Element(self.tag_name)
-        elem.text = " ".join([str(x) for x in self.value])
-        return elem

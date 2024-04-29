@@ -1,9 +1,9 @@
 import bpy
 import os
 
-from mathutils import Vector, Quaternion
+from mathutils import Vector
 from ..sollumz_helper import SOLLUMZ_OT_base, set_object_collection
-from ..tools.ymaphelper import add_occluder_material, create_ymap, create_ymap_group, ensure_grass_proc_model
+from ..tools.ymaphelper import add_occluder_material, create_ymap, create_ymap_group
 from ..sollumz_properties import SOLLUMZ_UI_NAMES, SollumType
 
 
@@ -114,77 +114,6 @@ class SOLLUMZ_OT_create_car_generator_group(SOLLUMZ_OT_base, bpy.types.Operator)
         create_ymap_group(sollum_type=SollumType.YMAP_CAR_GENERATOR_GROUP, selected_ymap=ymap_obj, empty_name='Car Generators')
         return True
 
-
-class SOLLUMZ_OT_create_grass_instanced_data_group(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Create a sollumz 'Car Generators' group object"""
-    bl_idname = "sollumz.create_grass_instanced_data_group"
-    bl_label = f"Grass Instances"
-    bl_description = "Create 'Grass Instances' group.\n\nOnly 1 per YMAP maximum"
-
-    @classmethod
-    def poll(cls, context):
-        aobj = context.active_object
-        existing_groups = []
-        for child in aobj.children:
-            existing_groups.append(child.name)
-        for group in existing_groups:
-            if group == "Grass Instances":
-                return False
-        return True
-
-    def run(self, context):
-        ymap_obj = context.active_object
-        create_ymap_group(sollum_type=SollumType.YMAP_GRASS_INSTANCED_DATA, selected_ymap=ymap_obj, empty_name='Grass Instances')
-
-class SOLLUMZ_OT_create_grass_instance(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Create a sollumz 'Box Occluder' object"""
-    bl_idname = "sollumz.create_grass_instance"
-    bl_label = "Create Grass Instance"
-    bl_description = "Create a 'Grass Instance' object"
-
-    def run(self, context):
-        group_obj = context.selected_objects[0]
-        subgroup_obj = bpy.data.objects.new('Grass instance', None)
-        subgroup_obj.scale = Vector([1, 1, 1])
-        subgroup_obj.parent = group_obj
-        subgroup_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE_LIST_DEF
-        
-        bpy.context.collection.objects.link(subgroup_obj)
-        
-        return True
-
-class SOLLUMZ_OT_create_grass_instance_prop(SOLLUMZ_OT_base, bpy.types.Operator):
-    """Create a sollumz 'Box Occluder' object"""
-    bl_idname = "sollumz.create_grass_instance_prop"
-    bl_label = "Create Grass Instance Prop"
-    bl_description = "Create a 'Grass Instance Prop' object"
-
-    def run(self, context):
-        group_obj = context.selected_objects[0]
-        
-        base_obj = ensure_grass_proc_model(group_obj.ymap_grass_instance_list_properties.archetypeName)
-        
-        model_obj = base_obj.copy()
-        model_obj.rotation_mode = 'QUATERNION'
-        
-        model_obj.sollum_type = SollumType.YMAP_GRASS_INSTANCE
-        
-        model_obj.ymap_grass_instance_list_item_properties.position = Vector([0,0,0])
-        model_obj.ymap_grass_instance_list_item_properties.normalX = 0
-        model_obj.ymap_grass_instance_list_item_properties.normalY = 0
-        model_obj.ymap_grass_instance_list_item_properties.color = [1, 1, 1]
-        model_obj.ymap_grass_instance_list_item_properties.scale = 1
-        model_obj.ymap_grass_instance_list_item_properties.ao = 1
-        model_obj.ymap_grass_instance_list_item_properties.pad = [0, 0, 0]
-        
-        bpy.context.collection.objects.link(model_obj)
-        
-        model_obj.parent = group_obj
-        model_obj.location = Vector([0,0,0])
-        model_obj.rotation_quaternion = Quaternion()
-        model_obj.scale = Vector([1, 1, 1])
-    
-        return True
 
 class SOLLUMZ_OT_create_box_occluder(SOLLUMZ_OT_base, bpy.types.Operator):
     """Create a sollumz 'Box Occluder' object"""
